@@ -4,23 +4,25 @@ using System.Linq;
 using System.Text;
 using UnityEngine;
 
-namespace TeamGameMode
+namespace TeamsGameMode
 {
     public class TGM_Area : MonoBehaviour
     {
+        public int iff = 0;
+
         [Header("The area which players can capture this point in if capturable")]
         public Transform capturePoint;
         [Header("The location the objective will spawn, e.g. Flag for CTF")]
         public Transform objective;
         [Header("Area where players can spawn, can be scaled")]
         public Transform[] spawnPoints;
-        [Header("Points of interest Sosigs will path to")]
+        [Header("Points of interest Sosigs will path to in this area")]
         public Transform[] sosigWaypoints;
 
         [Header("Navigation Blockers that enable when owned by this areas team")]
-        public GameObject[] friendNavBlockers;
+        public GameObject[] navBlockersFriendly;
         [Header("Navigation Blockers that are enabled not on this areas team, e.g. stop enemies getting into spawn area")]
-        public GameObject[] enemyNavBlockers;
+        public GameObject[] navBlockersEnemy;
 
 
 

@@ -4,7 +4,7 @@ using System.Text;
 using UnityEngine;
 using UnityEngine.AI;
 
-namespace TeamGameMode
+namespace TeamsGameMode
 {
     public class TGM_Scene : MonoBehaviour
     {

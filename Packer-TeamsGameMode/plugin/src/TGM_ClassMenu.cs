@@ -6,7 +6,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using FistVR;
 
-namespace TeamGameMode
+namespace TeamsGameMode
 {
     public class TGM_ClassMenu : MonoBehaviour
     {

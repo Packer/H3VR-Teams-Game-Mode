@@ -6,7 +6,7 @@ using FistVR;
 using UnityEngine;
 
 
-namespace TeamGameMode
+namespace TeamsGameMode
 {
     [Serializable]
     public class TGM_Gamemode

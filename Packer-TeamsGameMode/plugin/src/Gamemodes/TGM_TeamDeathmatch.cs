@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace TeamGameMode
+namespace TeamsGameMode
 {
     [Serializable]
     public class TGM_TeamDeathmatch : TGM_Gamemode

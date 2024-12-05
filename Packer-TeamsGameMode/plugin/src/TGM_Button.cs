@@ -7,7 +7,7 @@ using UnityEngine.UI;
 using FistVR;
 
 
-namespace TeamGameMode
+namespace TeamsGameMode
 {
     public class TGM_Button : MonoBehaviour
     {

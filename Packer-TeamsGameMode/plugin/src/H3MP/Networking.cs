@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using H3MP.Scripts;
-using TeamGameMode;
+using TeamsGameMode;
 using UnityEngine;
 
 namespace H3MP.Networking

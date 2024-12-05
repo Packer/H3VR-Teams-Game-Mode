@@ -3,7 +3,7 @@ using System.Linq;
 using System.Text;
 using UnityEngine;
 
-namespace TeamGameMode
+namespace TeamsGameMode
 {
     public class TGM_Manager : MonoBehaviour
     {
@@ -23,6 +23,7 @@ namespace TeamGameMode
         public TGM_Player localPlayer = new TGM_Player();
         public TGM_Player[] players;
         public TGM_Player[] sosigs;
+        public float nextSpawnWave = 0;
 
         void Awake()
         {

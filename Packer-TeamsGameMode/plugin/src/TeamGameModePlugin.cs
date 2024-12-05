@@ -4,7 +4,7 @@ using BepInEx.Logging;
 using Atlas;
 using Atlas.Loaders;
 
-namespace TeamGameMode
+namespace TeamsGameMode
 {
     [BepInAutoPlugin]
     [BepInProcess("h3vr.exe")]

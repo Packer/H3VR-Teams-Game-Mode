@@ -5,7 +5,7 @@ using System.Text;
 using UnityEngine;
 using FistVR;
 
-namespace TeamGameMode
+namespace TeamsGameMode
 {
     [Serializable]
     public class TGM_Player

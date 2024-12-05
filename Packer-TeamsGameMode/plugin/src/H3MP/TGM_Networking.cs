@@ -6,7 +6,7 @@ using UnityEngine;
 using H3MP;
 using H3MP.Networking;
 
-namespace TeamGameMode.H3MP
+namespace TeamsGameMode.H3MP
 {
     public  class TGM_Networking : MonoBehaviour
     {

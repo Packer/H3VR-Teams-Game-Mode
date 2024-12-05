@@ -6,7 +6,7 @@ using System.Text;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace TeamGameMode
+namespace TeamsGameMode
 {
     public class TGM_MainMenu : MonoBehaviour
     {
@@ -23,6 +23,13 @@ namespace TeamGameMode
         }
 
         [Header("Page: Game Settings")]
+        public Text optionSpawnLockText;
+        public Text optionSpawnWaveTime;
+        public Text optionTimeLimit;
+        public Text optionTeams;
+        public Text optionCanRespawn;
+
+
         //Put Base Game settings here
         //Save Data?
         [Header("Page: Team Select")]
@@ -80,6 +87,7 @@ namespace TeamGameMode
         {
             TGM_Manager.instance.gamemode = TGM_Manager.instance.gamemodes[index];
             OpenPage(Page.GameSettings);
+            UpdateSettings();
         }
 
         //-------------------------------------------------------------------------------------
@@ -91,6 +99,7 @@ namespace TeamGameMode
             if (TeamGameModePlugin.h3mp)
             {
                 //Send Settings
+
             }
         }
 
