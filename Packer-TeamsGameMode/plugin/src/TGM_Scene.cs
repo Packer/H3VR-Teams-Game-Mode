@@ -10,18 +10,21 @@ namespace TeamsGameMode
     {
         public static TGM_Scene instance;
         [Header("Setup")]
-        public Transform[] teams = new Transform[2];
+        public TeamSpawnRoom[] teams = new TeamSpawnRoom[2];
         public TGM_Area[] areas = new TGM_Area[2];
+        public Transform mainMenu;
 
         [System.Serializable]
         public class TeamSpawnRoom
         {
             [Tooltip("The area which a player can respawn, can be scaled")]
             public Transform respawnArea;   //Based on Gizmo
-            [Tooltip("The respawn team menu for rejoining the game")]
-            public Transform teamSpawnMenu;
+            [Tooltip("The team menu for spectating, scoreboard and rejoining the game")]
+            public Transform teamMenu;
             [Tooltip("The Starting area for this Team")]
             public TGM_Area startSpawnArea;
+            [Tooltip("Recommended Team Objective Score for this team, set to 0 or less to use default")]
+            public int teamScore = 0;
         }
 
         public static Vector3 GetTeamSpawnRoom(int team)
@@ -59,6 +62,31 @@ namespace TeamsGameMode
                 if (teams[i].respawnArea != null)
                     Gizmos.DrawCube(teams[i].respawnArea.position, teams[i].respawnArea.localScale / 2);
                 
+            }
+        }
+
+        void OnValidate()
+        {
+            if (teams.Length < 2)
+            {
+                List<TeamSpawnRoom> newTeams = teams.ToList();
+                int missing = 2 - newTeams.Count;
+                for (int i = 0; i < missing; i++)
+                {
+                    newTeams.Add(new TeamSpawnRoom());
+                }
+                teams = newTeams.ToArray();
+            }
+
+            if (areas.Length < 2)
+            {
+                List<TGM_Area> newAreas = areas.ToList();
+                int missing = 2 - newAreas.Count;
+                for (int i = 0; i < missing; i++)
+                {
+                    newAreas.Add(new TGM_Area());
+                }
+                areas = newAreas.ToArray();
             }
         }
     }

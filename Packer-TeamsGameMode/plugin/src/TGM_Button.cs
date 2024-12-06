@@ -11,9 +11,10 @@ namespace TeamsGameMode
 {
     public class TGM_Button : MonoBehaviour
     {
-        public Text text;
-        public Button button;
+        public Text[] texts;
+        public Button[] buttons;
         public int index = -1;
+        public int value = 0;
 
         public void SelectClass(int index)
         {
@@ -23,6 +24,20 @@ namespace TeamsGameMode
         public void LaunchGame()
         {
             
+        }
+
+        public void AdjustSettingValue(int amount)
+        {
+            TGM_MainMenu.Setting setting = TGM_MainMenu.instance.settings[index];
+
+            //Loop Around
+            if (value + amount > setting.intMax)
+                value = setting.intMin;
+            else if (value + amount < setting.intMin)
+                value = setting.intMax;
+            else
+                value += amount;
+            TGM_MainMenu.instance.UpdateSettings();
         }
 
         public void ChooseGamemode(int index)

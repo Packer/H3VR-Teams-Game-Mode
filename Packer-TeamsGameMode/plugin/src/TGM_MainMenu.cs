@@ -22,7 +22,30 @@ namespace TeamsGameMode
             WaitForHost = 3,
         }
 
+        [System.Serializable]
+        public class Setting
+        {
+            public SettingEnum setting; //For Internal use only, doesn't do anything
+            public string description;
+            public string[] settings;
+            public SettingType type = SettingType.Strings;
+            public int value = 0;
+            public int intMin = 0;
+            public int intMax = 64;
+            [Tooltip("If true, does not sync over H3MP")]
+            public bool localOnly = false;
+            public bool active = true;  //Disabled via code if not valid
+
+            public enum SettingType
+            {
+                Strings = 0,
+                Int = 1,
+            }
+        }
+
         [Header("Page: Game Settings")]
+        public List<Setting> settings = new List<Setting>();
+        public GameObject settingPrefab;
         public Text optionSpawnLockText;
         public Text optionSpawnWaveTime;
         public Text optionTimeLimit;
@@ -37,7 +60,6 @@ namespace TeamsGameMode
 
         [Header("Gamemode Window")]
         public GameObject gamemodeBtnPrefab;
-        public Transform gamemodeContent;
         public TGM_Button[] gamemodesBtns;
 
 
@@ -58,14 +80,15 @@ namespace TeamsGameMode
         {
             //Populate Main Menu
             SetupGamemodes();
+            SetupSettings();
         }
 
 
-        //-------------------------------------------------------------------------------------
-        // Game Modes
-        //-------------------------------------------------------------------------------------
+    //-------------------------------------------------------------------------------------
+    // Game Modes
+    //-------------------------------------------------------------------------------------
 
-        public void SetupGamemodes()
+    public void SetupGamemodes()
         {
             for (int i = 0; i < TGM_Manager.instance.gamemodes.Length; i++)
             {
@@ -76,9 +99,9 @@ namespace TeamsGameMode
 
                 TGM_Gamemode gm = TGM_Manager.instance.gamemodes[i];
 
-                TGM_Button btn = Instantiate(gamemodeBtnPrefab, gamemodeContent).GetComponent<TGM_Button>();
-                btn.text.text = gm.name;
-                btn.button.image.sprite = gm.thumbnail;
+                TGM_Button btn = Instantiate(gamemodeBtnPrefab, gamemodeBtnPrefab.transform).GetComponent<TGM_Button>();
+                btn.texts[0].text = gm.name;
+                btn.buttons[0].image.sprite = gm.thumbnail;
                 btn.index = i;
             }
         }
@@ -94,8 +117,36 @@ namespace TeamsGameMode
         // Game Settings
         //-------------------------------------------------------------------------------------
 
+        void SetupSettings()
+        {
+            for (int i = 0; i < settings.Count; i++)
+            {
+                //If only 2 teams, hide team setting
+                if (i == (int)SettingEnum.Teams && TGM_Scene.instance.teams.Length <= 2)
+                    continue;
+
+                TGM_Button btn = Instantiate(settingPrefab, settingPrefab.transform).GetComponent<TGM_Button>();
+                btn.index = i;
+                btn.value = settings[i].value;
+
+                btn.texts[0].text = settings[i].description;
+
+                //Current Setting
+                if (settings[i].type == Setting.SettingType.Strings)
+                    btn.texts[1].text = settings[i].settings[settings[i].value]; //Text
+                else
+                    btn.texts[1].text = settings[i].value.ToString(); //Number
+            }
+        }
+
         public void UpdateSettings()
         {
+            for (int i = 0; i < settings.Count; i++)
+            {
+
+            }
+
+
             if (TeamGameModePlugin.h3mp)
             {
                 //Send Settings
@@ -124,4 +175,13 @@ namespace TeamsGameMode
             pages[(int)index].SetActive(true);
         }
     }
+}
+
+public enum SettingEnum
+{
+    SpawnLock = 0,
+    SpawnWaveTime = 1,
+    TimeLimit = 2,
+    Teams = 3,
+    CanRespawn = 4
 }
