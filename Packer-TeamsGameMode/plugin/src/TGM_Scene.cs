@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using UnityEngine;
 using UnityEngine.AI;
 
@@ -9,10 +8,28 @@ namespace TeamsGameMode
     public class TGM_Scene : MonoBehaviour
     {
         public static TGM_Scene instance;
-        [Header("Setup")]
+        [Header("Scene Setup")]
         public TeamSpawnRoom[] teams = new TeamSpawnRoom[2];
         public TGM_Area[] areas = new TGM_Area[2];
         public Transform mainMenu;
+
+        [Header("Audio Overwrite")]
+        [Tooltip("Start Game, or spawn items etc")]
+        public AudioClip audioConfirm;
+        [Tooltip("Regular Button Press")]
+        public AudioClip audioPress;
+        [Tooltip("Something broke or didn't accept input")]
+        public AudioClip audioFail;
+        [Tooltip("Rearm Player")]
+        public AudioClip audioRearm;
+        [Tooltip("Player's Team Objective point change")]
+        public AudioClip audioPoint;
+        [Tooltip("Get Kill")]
+        public AudioClip audioElimination;
+        [Tooltip("Player's Team Won")]
+        public AudioClip audioTeamWon;
+        [Tooltip("Player's Team Lost")]
+        public AudioClip audioTeamLost;
 
         [System.Serializable]
         public class TeamSpawnRoom
@@ -27,21 +44,20 @@ namespace TeamsGameMode
             public int teamScore = 0;
         }
 
-        public static Vector3 GetTeamSpawnRoom(int team)
+        /// <summary>
+        /// Returns the input IFF Team Spawn Room
+        /// </summary>
+        /// <param name="iff"></param>
+        /// <returns></returns>
+        public static TeamSpawnRoom Team(int iff)
         {
-            Vector3 position = instance.teams[team].respawnArea.position;
-            Vector3 scale = instance.teams[team].respawnArea.localScale;
-            Vector3 randomPosition 
-                = new Vector3(
-                    Random.Range(-scale.x, scale.x), 
-                    Random.Range(-scale.y, scale.y), 
-                    Random.Range(-scale.z, scale.z));
+            return instance.teams[iff];
+        }
 
-            //Assign Position
-            if(NavMesh.SamplePosition(randomPosition, out NavMeshHit hit, 1f, NavMesh.AllAreas))
-                position = hit.position;
 
-            return position;
+        public static Transform GetTeamSpawnRoomTransform(int team)
+        {
+            return instance.teams[team].respawnArea;
         }
 
         void Awake()

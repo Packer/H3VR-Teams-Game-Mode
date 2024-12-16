@@ -22,7 +22,7 @@ GameObject:
   - component: {fileID: 222817377187074192}
   - component: {fileID: 114701182768536250}
   - component: {fileID: 114929844069066578}
-  m_Layer: 5
+  m_Layer: 10
   m_Name: Text
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -40,13 +40,57 @@ GameObject:
   - component: {fileID: 222456337534411206}
   - component: {fileID: 114737684072721420}
   - component: {fileID: 114598162650039540}
-  m_Layer: 5
+  - component: {fileID: 65006837582890544}
+  - component: {fileID: 114293642897864876}
+  m_Layer: 10
   m_Name: Button_Master
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
+--- !u!65 &65006837582890544
+BoxCollider:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1497489943736036}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Size: {x: 0, y: 0, z: 1}
+  m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &114293642897864876
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1497489943736036}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 1779390015, guid: 2dad86f9e6b5aece0f7796226ce8c243, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  MaxPointingRange: 10
+  PointingHands: []
+  m_isBeingPointedAt: 0
+  ColorUnselected: {r: 1, g: 1, b: 1, a: 1}
+  ColorSelected: {r: 1, g: 1, b: 1, a: 1}
+  Button: {fileID: 114598162650039540}
+  m_usesButton: 0
+  Image: {fileID: 114737684072721420}
+  m_usesImage: 0
+  Text: {fileID: 114701182768536250}
+  m_usesText: 0
+  Rend: {fileID: 0}
+  m_usesRend: 0
+  ColorName: _Color
+  m_scaleTick: 0
+  DoesRepeat: 0
+  RepeatTime: 0.2
+  m_timeSincePress: 1
+  nextScaleTick: 0
 --- !u!114 &114598162650039540
 MonoBehaviour:
   m_ObjectHideFlags: 1

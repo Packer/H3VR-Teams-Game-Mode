@@ -31,7 +31,7 @@ namespace TeamsGameMode.H3MP
                     updatePlayerStats = Mod.registeredCustomPacketIDs["TGM_PlayerStatsUpdate"];
                 else
                     updatePlayerStats = Server.RegisterCustomPacketType("TGM_PlayerStatsUpdate");
-                Mod.customPacketHandlers[updatePlayerStats] = LevelUpdate_Handler;
+                Mod.customPacketHandlers[updatePlayerStats] = StatsUpdate_Handler;
 
             }
             else // Client
@@ -39,12 +39,12 @@ namespace TeamsGameMode.H3MP
                 if (Mod.registeredCustomPacketIDs.ContainsKey("TGM_PlayerStatsUpdate"))
                 {
                     updatePlayerStats = Mod.registeredCustomPacketIDs["TGM_PlayerStatsUpdate"];
-                    Mod.customPacketHandlers[updatePlayerStats] = LevelUpdate_Handler;
+                    Mod.customPacketHandlers[updatePlayerStats] = StatsUpdate_Handler;
                 }
                 else
                 {
                     ClientSend.RegisterCustomPacketType("TGM_PlayerStatsUpdate");
-                    Mod.CustomPacketHandlerReceived += LevelUpdate_Received;
+                    Mod.CustomPacketHandlerReceived += StatsUpdate_Received;
                 }
             }
         }
@@ -52,54 +52,42 @@ namespace TeamsGameMode.H3MP
         //  Send and Receive
         //---------------------------------------------------------------
 
-        //Level Update Send
-        public void LevelUpdate_Send(TGM_Player player)
+        //---------------------------------------------------------------
+        // STATS UPDATE
+        // Send
+        public void StatsUpdate_Send(TGM_Player player)
         {
             if (!Networking.ServerRunning() || Networking.IsClient())
                 return;
 
             Packet packet = new Packet(updatePlayerStats);
 
-            packet.Write(player.iff);
+            packet.Write(player.kills);
             ServerSend.SendTCPDataToAll(packet, true);
 
-            Debug.Log("TGM: Host - : " + SR_Manager.instance.CurrentCaptures);
+            TeamGameModePlugin.Logger.LogMessage($"Host - Stats Update " + player.kills);
         }
 
-        //Level Update Receive
-        void LevelUpdate_Handler(int clientID, Packet packet)
+        // Receive
+        void StatsUpdate_Handler(int clientID, Packet packet)
         {
-            int totalCaptures = packet.ReadInt();
+            int totalKills = packet.ReadInt();
 
-            if (gameComplete)
-            {
-                //Stats
-                //SR_Manager.instance.CurrentCharacterLevel = characterLevel;
-                //SR_Manager.instance.CurrentFactionLevel = factionLevel;
-                SR_Manager.instance.CurrentCaptures = totalCaptures;
-
-                SR_Manager.instance.gameCompleted = gameComplete;
-                SR_Manager.instance.stats.ObjectiveComplete = objective;
-                SR_Manager.instance.CompleteGame();
-            }
-            else
-                SR_Manager.instance.SetLevel_Client(totalCaptures, supply, lastSupply, endless);
-
-
-            Debug.Log("Supply Raid: Client - Level Update: " + totalCaptures);
+            TeamGameModePlugin.Logger.LogMessage($"Client - Level Update " + totalKills);
         }
+        //---------------------------------------------------------------
 
         //---------------------------------------------------------------
         //(Client) Packet Handlers
         //---------------------------------------------------------------
 
-        void LevelUpdate_Received(string identifier, int index)
+        void StatsUpdate_Received(string identifier, int index)
         {
             if (identifier == "TGM_PlayerStatsUpdate")
             {
                 updatePlayerStats = index;
-                Mod.customPacketHandlers[index] = LevelUpdate_Handler;
-                Mod.CustomPacketHandlerReceived -= LevelUpdate_Received;
+                Mod.customPacketHandlers[index] = StatsUpdate_Handler;
+                Mod.CustomPacketHandlerReceived -= StatsUpdate_Received;
             }
         }
     }

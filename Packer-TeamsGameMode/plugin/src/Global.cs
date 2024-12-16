@@ -1,12 +1,28 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using UnityEngine;
+using UnityEngine.AI;
 
 namespace TeamsGameMode
 {
     public class Global
     {
+        public static Vector3 GetValidSpawnPoint(Transform transform)
+        {
+            Vector3 position = transform.position;
+            Vector3 scale = transform.localScale;
+            Vector3 randomPosition
+                = new Vector3(
+                    Random.Range(-scale.x, scale.x),
+                    Random.Range(-scale.y, scale.y),
+                    Random.Range(-scale.z, scale.z));
+
+            //Assign Position
+            if (NavMesh.SamplePosition(randomPosition, out NavMeshHit hit, 1f, NavMesh.AllAreas))
+                position = hit.position;
+
+            return position;
+        }
+
+
         public static string[] namesDB =
             {
             "🪦_mince_of_spades_🪦",

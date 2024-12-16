@@ -23,7 +23,7 @@ namespace TeamsGameMode
 
         public void LaunchGame()
         {
-            
+
         }
 
         public void AdjustSettingValue(int amount)
@@ -45,14 +45,46 @@ namespace TeamsGameMode
             TGM_MainMenu.instance.SelectGamemode(index);
         }
 
-        public void JoinTeam(int index)
+        public void SelectTeamSetup()
         {
-            GM.CurrentPlayerBody.SetPlayerIFF(index);
+            TGM_TeamSetup.instance.SelectTeam(index);
+        }
+
+        public void SelectProfile()
+        {
+            TGM_ProfileMenu.instance.SetProfile(texts[0].text);
+        }
+
+        public void SelectBrowserItem()
+        {
+            TGM_TeamSetup.instance.SelectBrowser(index);
+        }
+
+        public void JoinTeam(int iff)
+        {
+            GM.CurrentPlayerBody.SetPlayerIFF(iff);
+
+            Transform spawn = TGM_Scene.GetTeamSpawnRoomTransform(iff);
 
             //Teleport to team spawn room
-            GM.CurrentMovementManager.TeleportToPoint(POSITIONGOHERE,
+            GM.CurrentMovementManager.TeleportToPoint(Global.GetValidSpawnPoint(spawn),
                 true,
-                SR_Manager.instance.supplyPoints[lastID].respawn.forward);
+                spawn.rotation.eulerAngles);
+        }
+
+        void OnValidate()
+        {
+            BoxCollider box = gameObject.GetComponent<BoxCollider>();
+
+            if (box == null)
+                return;
+
+            RectTransform rect = gameObject.GetComponent<RectTransform>();
+
+            if (!rect)
+                return;
+
+            box.size = new Vector3(rect.sizeDelta.x, rect.sizeDelta.y, 1);
         }
     }
 }

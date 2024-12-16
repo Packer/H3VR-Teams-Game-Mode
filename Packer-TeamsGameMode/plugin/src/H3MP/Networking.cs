@@ -1,30 +1,48 @@
 ﻿using System.Collections.Generic;
 using H3MP.Scripts;
-using TeamsGameMode;
 using UnityEngine;
+using BepInEx;
+using BepInEx.Bootstrap;
+using BepInEx.Logging;
 
 namespace H3MP.Networking
 {
     public class Networking
     {
+        static int h3mp = -1; // -1 - Not Checked | 0 - No H3MP | 1 - H3MP
+
+        public static bool H3MP
+        {
+            get
+            {
+                if (h3mp == -1)
+                    h3mp = Chainloader.PluginInfos.ContainsKey("VIP.TommySoucy.H3MP") ? 1 : 0;
+
+                return h3mp == 1 ? true : false;
+            }
+        }
+
         /// <summary>
         /// Returns true if a server is running
         /// </summary>
         /// <returns></returns>
         public static bool ServerRunning()
         {
-            if (TeamGameModePlugin.h3mp)
-                return isServerRunning();
+            if (H3MP)
+                return isServerRunning;
 
             return false;
         }
 
-        static bool isServerRunning()
+        static bool isServerRunning
         {
-            if (Mod.managerObject == null)
-                return false;
+            get
+            {
+                if (Mod.managerObject == null)
+                    return false;
 
-            return true;
+                return true;
+            }
         }
 
         /// <summary>
@@ -33,7 +51,7 @@ namespace H3MP.Networking
         /// <returns></returns>
         public static bool IsClient()
         {
-            if (TeamGameModePlugin.h3mp)
+            if (H3MP)
                 return isClient();
 
             return false;
@@ -55,29 +73,31 @@ namespace H3MP.Networking
         /// <returns></returns>
         public static bool IsHost()
         {
-            if (TeamGameModePlugin.h3mp)
-                return isHosting();
+            if (H3MP)
+                return isHosting;
 
             return false;
         }
 
         //Soft Dependency
-        static bool isHosting()
+        static bool isHosting
         {
-            if (Mod.managerObject == null)
-                return false;
+            get
+            {
+                if (Mod.managerObject == null)
+                    return false;
 
-            if (ThreadManager.host == true)
-                return true;
-            return false;
+                if (ThreadManager.host == true)
+                    return true;
+                return false;
+            }
         }
 
         public static int GetPlayerCount()
         {
-            if (TeamGameModePlugin.h3mp)
+            if (H3MP)
                 return GetNetworkPlayerCount();
             return 1;
-
         }
 
         static int GetNetworkPlayerCount()
@@ -106,7 +126,7 @@ namespace H3MP.Networking
         */
 
         /// <summary>
-        /// Returns array of all players (Not including local player) IDs
+        /// Returns array of all players IDs (Does not include local player)
         /// </summary>
         /// <returns></returns>
         public static int[] GetPlayerIDs()
@@ -127,7 +147,7 @@ namespace H3MP.Networking
         /// Returns the local player's id.
         /// </summary>
         /// <returns></returns>
-        public static int GetLocalID()
+        public static int GetLocalPlayerID()
         {
             return GameManager.ID;
         }
@@ -149,7 +169,8 @@ namespace H3MP.Networking
         }
 
         /// <summary>
-        /// Returns the Gamemanager player at index i, does not include the local player.
+        /// Returns the Gamemanager player at index i, does not include the local player. 
+        /// Use FistVR.GM.CurrentPlayerBody for local player.
         /// </summary>
         /// <param name="i"></param>
         /// <returns></returns>

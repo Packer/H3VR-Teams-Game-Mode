@@ -10,7 +10,8 @@ namespace TeamsGameMode
 {
     public class TGM_PlayerClass
     {
-        private Sprite thumbnail;
+        public string name;
+        public Sprite thumbnail;
         public bool canSpawnLock = true;    //Spawnlock per class
         public string[] objectIDs;  //Direct Object ID references
         public TableTags[] tables;

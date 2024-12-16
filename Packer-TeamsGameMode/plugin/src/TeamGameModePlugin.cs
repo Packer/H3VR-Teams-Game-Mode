@@ -18,11 +18,11 @@ namespace TeamsGameMode
         {
             Logger = base.Logger;
 
-            AtlasPlugin.Loaders["teamgamemode"] = new SandboxLoader();
+            AtlasPlugin.Loaders["teamsgamemode"] = new SandboxLoader();
             h3mp = Chainloader.PluginInfos.ContainsKey("VIP.TommySoucy.H3MP");
 
 
-            Logger.LogMessage($"Hello, world! Sent from {Id} {Name} {Version}");
+            //Logger.LogMessage($"Hello, world! Sent from {Id} {Name} {Version}");
         }
         
         internal new static ManualLogSource Logger { get; private set; }
