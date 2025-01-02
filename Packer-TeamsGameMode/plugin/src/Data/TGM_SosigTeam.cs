@@ -20,8 +20,8 @@ namespace TeamsGameMode
 
         public class SosigSet
         {
-            public int minKill = -1;
-            public int maxKill = -1;
+            public int minKills = -1;
+            public int maxKills = -1;
 
             [Tooltip("SosigEnemyID list, add duplicate IDs to weight them more likely to be picked")]
             public int[] sosigEnemyIDs;

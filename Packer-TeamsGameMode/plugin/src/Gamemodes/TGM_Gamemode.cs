@@ -48,6 +48,11 @@ namespace TeamsGameMode
             TGM_Teams.instance.teams[teamID].currentScore += amount;
         }
 
+        public virtual void OnSosigCreate(Sosig s)
+        {
+            //Command Sosig here
+        }
+
         /// <summary>
         /// Hook into when a Sosig is killed
         /// </summary>
@@ -64,7 +69,7 @@ namespace TeamsGameMode
         /// <param name="killerIFF"></param>
         public virtual void OnPlayerKilled(int playerIndex, int killerIFF)
         {
-
+            AdjustTeamScore(GM.CurrentPlayerBody.GetPlayerIFF(), 1);
         }
     }
 }

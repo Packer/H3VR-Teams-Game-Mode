@@ -46,6 +46,17 @@ namespace TeamsGameMode
         public List<Vector3> GetRandomAttackArea()
         {
             Transform area = sosigAttackAreas[Random.Range(0, sosigAttackAreas.Length)];
+            return GetRandomAreaPositions(area);
+        }
+
+        public List<Vector3> GetRandomDefendArea()
+        {
+            Transform area = sosigDefendAreas[Random.Range(0, sosigAttackAreas.Length)];
+            return GetRandomAreaPositions(area);
+        }
+
+        private List<Vector3> GetRandomAreaPositions(Transform area)
+        {
             List<Vector3> locations = new List<Vector3>();
 
             Vector3 areaScale = area.localScale / 2;
@@ -53,13 +64,16 @@ namespace TeamsGameMode
             for (int i = 0; i < 2; i++)
             {
                 Vector3 pos = area.position + new Vector3(
-                    Random.Range(-areaScale.x, areaScale.x), 
+                    Random.Range(-areaScale.x, areaScale.x),
                     Random.Range(-areaScale.y, areaScale.y),
                     Random.Range(-areaScale.z, areaScale.z));
+
+                //TODO NAV MESH SANITY CHECK
 
                 locations.Add(pos);
             }
 
+            //Look Direction
             locations.Add(area.rotation.eulerAngles);
 
             return locations;

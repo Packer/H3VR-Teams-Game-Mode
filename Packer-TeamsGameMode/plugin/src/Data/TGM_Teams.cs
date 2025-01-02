@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using UnityEngine;
 using FistVR;
 using Sodalite.Api;
@@ -19,6 +17,11 @@ namespace TeamsGameMode
 
         public Team[] teams;
 
+        public static Team GetTeam(int iff)
+        {
+            return instance.teams[iff];
+        }
+
         [Serializable]
         public class Team
         {
@@ -32,6 +35,7 @@ namespace TeamsGameMode
             public Color color;
 
             //Tracking
+            public int currentKills = 0;
             public int currentScore = 80;
             public TGM_Area currentSpawnArea;
 
@@ -111,43 +115,30 @@ namespace TeamsGameMode
                 }
             }
 
-            public void UpdateAllSosigsAttackArea()
-            {
-                for (int i = 0; i < sosigs.Count; i++)
-                {
-                    if (sosigs[i] != null)
-                        UpdateSosigAttackArea(sosigs[i]);
-                }
-            }
-
-            public void UpdateSosigAttackArea(Sosig sosig)
-            {
-                List<Vector3> locations = instance.teams[(iff == 0) ? 1 : 0].currentSpawnArea.GetRandomAttackArea();
-                List<Vector3> pathDirs = new List<Vector3> { locations[2], locations[2] };
-                locations.RemoveAt(2);
-                List<Vector3> pathPoints = locations;
-
-                sosig.CommandPathTo(
-                    pathPoints,
-                    pathDirs,
-                    1,
-                    Vector2.one * 4,
-                    20f,
-                    Sosig.SosigMoveSpeed.Running,
-                    Sosig.PathLoopType.LoopEndless,
-                    null,
-                    0.2f,
-                    1f,
-                    true,
-                    50f);
-            }
 
             public Sosig CreateTeamSosig(SosigAPI.SpawnOptions spawnOptions, Vector3 position, Quaternion rotation, int sosigID = -2)
             {
                 //If not custom sosig, use team ID
                 if (sosigID == -2)
-                    sosigID = sosigTeam.GetRandomSosigEnemyID();
+                {
+                    List<TGM_SosigTeam.SosigSet> sets = new List<TGM_SosigTeam.SosigSet>();
 
+                    for (int i = 0; i < sosigTeam.sosigSet.Length; i++)
+                    {
+                        if (currentKills > sosigTeam.sosigSet[i].minKills
+                            && currentKills <= sosigTeam.sosigSet[i].maxKills)
+                        {
+                            sets.Add(sosigTeam.sosigSet[i]);
+                        }
+                    }
+
+                    //Backup make sure we have at least ONE sosig set
+                    if (sets.Count <= 0)
+                        sets.Add(sosigTeam.sosigSet[0]);
+
+                    TGM_SosigTeam.SosigSet selectedSet = sets[Random.Range(0, sets.Count)];
+                    sosigID = selectedSet.sosigEnemyIDs[Random.Range(0, selectedSet.sosigEnemyIDs.Length)];
+                }
 
                 Sosig sosig =
                     SosigAPI.Spawn(

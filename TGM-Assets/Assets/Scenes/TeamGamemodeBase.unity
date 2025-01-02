@@ -393,20 +393,26 @@ MonoBehaviour:
       name: 
       description: 
       thumbnail: {fileID: 0}
-      sosigTeam:
-        name: 
-        description: A short description of this sosig faction
+      playerClasses:
+      - name: 
         thumbnail: {fileID: 0}
-        sosigEnemyIDs: 
+        spriteName: Image.png
+        canSpawnLock: 1
+        playerHealth: 5000
+        minKills: -1
+        maxKills: -1
+        subtractionIDs: []
+        subClasses: []
+      sosigTeam: 
     sosigTeam:
       name: 
       description: A short description of this sosig faction
       thumbnail: {fileID: 0}
-      sosigEnemyIDs: 
     sosigCount: 8
     scoreGoal: 80
     sosigs: []
     color: {r: 1, g: 0, b: 0, a: 1}
+    currentKills: 0
     currentScore: 80
     currentSpawnArea: {fileID: 0}
   addTeamButton: {fileID: 1052191457}
@@ -3251,20 +3257,26 @@ MonoBehaviour:
         name: 
         description: 
         thumbnail: {fileID: 0}
-        sosigTeam:
-          name: 
-          description: A short description of this sosig faction
+        playerClasses:
+        - name: 
           thumbnail: {fileID: 0}
-          sosigEnemyIDs: 
+          spriteName: Image.png
+          canSpawnLock: 1
+          playerHealth: 5000
+          minKills: -1
+          maxKills: -1
+          subtractionIDs: []
+          subClasses: []
+        sosigTeam: 
       sosigTeam:
         name: 
         description: A short description of this sosig faction
         thumbnail: {fileID: 0}
-        sosigEnemyIDs: 
       sosigCount: 8
       scoreGoal: 80
       sosigs: []
       color: {r: 1, g: 0, b: 0, a: 1}
+      currentKills: 0
       currentScore: 80
       currentSpawnArea: {fileID: 0}
     - teamName: 
@@ -3273,20 +3285,26 @@ MonoBehaviour:
         name: 
         description: 
         thumbnail: {fileID: 0}
-        sosigTeam:
-          name: 
-          description: A short description of this sosig faction
+        playerClasses:
+        - name: 
           thumbnail: {fileID: 0}
-          sosigEnemyIDs: 
+          spriteName: Image.png
+          canSpawnLock: 1
+          playerHealth: 5000
+          minKills: -1
+          maxKills: -1
+          subtractionIDs: []
+          subClasses: []
+        sosigTeam: 
       sosigTeam:
         name: 
         description: A short description of this sosig faction
         thumbnail: {fileID: 0}
-        sosigEnemyIDs: 
       sosigCount: 8
       scoreGoal: 80
       sosigs: []
       color: {r: 1, g: 0, b: 0, a: 1}
+      currentKills: 0
       currentScore: 80
       currentSpawnArea: {fileID: 0}
   gamemode:
@@ -16857,8 +16875,9 @@ MonoBehaviour:
   - description: 'Spawn Lock:'
     setting: 0
     settings:
-    - Disabled
-    - Enabled
+    - Disabled (Global)
+    - Enabled (Global)
+    - Set Per Class
     type: 0
     value: 0
     intMin: 0
@@ -16925,6 +16944,16 @@ MonoBehaviour:
     - Disabled
     - Enabled
     type: 0
+    value: 0
+    intMin: 0
+    intMax: 0
+    localOnly: 0
+    active: 0
+  - description: Player Health
+    setting: 7
+    settings:
+    - Set Per Class
+    type: 1
     value: 0
     intMin: 0
     intMax: 0

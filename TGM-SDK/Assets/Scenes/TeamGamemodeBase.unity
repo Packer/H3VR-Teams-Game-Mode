@@ -3329,6 +3329,10 @@ Prefab:
       propertyPath: enemyObjects.Array.data[0]
       value: 
       objectReference: {fileID: 1930976377}
+    - target: {fileID: 4162374046524118, guid: a589b84d91ad34749b3ae41a9ccebf74, type: 2}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: a589b84d91ad34749b3ae41a9ccebf74, type: 2}
   m_IsPrefabParent: 0

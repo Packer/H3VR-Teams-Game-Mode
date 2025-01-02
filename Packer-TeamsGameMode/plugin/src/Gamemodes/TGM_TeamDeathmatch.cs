@@ -44,6 +44,18 @@ namespace TeamsGameMode
             }    
         }
 
+        public override void OnSosigCreate(Sosig s)
+        {
+            base.OnSosigCreate(s);
+
+            int enemyIFF = TGM_Sosigs.GetEnemyIFF(s.GetIFF());
+            //GO attack other team!
+            TGM_Sosigs.OrderSosigToLocations(s, TGM_Teams.GetTeam(enemyIFF).currentSpawnArea.GetRandomAttackArea());
+            
+            //Defend Area
+            //TGM_Sosigs.OrderSosigToLocations(s, TGM_Teams.GetTeam(s.GetIFF()).currentSpawnArea.GetRandomDefendArea());
+        }
+
         public override void OnSosigKilled(Sosig s)
         {
             base.OnSosigKilled(s);

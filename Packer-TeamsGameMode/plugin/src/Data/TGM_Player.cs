@@ -35,6 +35,8 @@ namespace TeamsGameMode
                     UnityEngine.MonoBehaviour.Destroy(playersItems[i].gameObject);
             }
             playersItems.Clear();
+
+            TGM_ClassMenu.ResetSpawnPoints();
         }
     }
 }

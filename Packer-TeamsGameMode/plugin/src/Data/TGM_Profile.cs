@@ -14,4 +14,16 @@ namespace TeamsGameMode
         public int[] gameSettings;
         public int[] gamemodeSettings;
     }
+
+    public enum SettingEnum
+    {
+        SpawnLock = 0,
+        SpawnWaveTime = 1,
+        TimeLimit = 2,
+        CanRespawn = 3,
+        ShowFriendlies = 4,
+        ItemsOnDeath = 5,
+        SosigWeapons = 6,
+        PlayerHealth = 7,
+    }
 }

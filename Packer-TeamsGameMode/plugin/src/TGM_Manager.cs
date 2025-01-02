@@ -70,13 +70,16 @@ namespace TeamsGameMode
                 case GameStateEnum.GamemodeSelect:
                     //TODO reset entire gamemode back (Or Reload level?)
                     break;
-                case GameStateEnum.Setup:
+                case GameStateEnum.Setup:       //Gamemode being configured
                     gamemode.Setup();
-
                     break;
-                case GameStateEnum.Gameplay:
+                case GameStateEnum.Start:       //30 sec Count down to game start
                     break;
-                case GameStateEnum.Gameover:
+                case GameStateEnum.Gameplay:    //Combat
+                    break;
+                case GameStateEnum.Finale:      //30 Sec post gameplay
+                    break;
+                case GameStateEnum.Gameover:    //Final Scores, Wait for master or wait for all players to ready
                     break;
             }
         }
@@ -181,9 +184,10 @@ namespace TeamsGameMode
         {
             GamemodeSelect,
             Setup,
+            Start,      //Countdown to game start
             Gameplay,
             Finale,     //30 secs post game before game over
-            Gameover,
+            Gameover,   //Put everyone back into start room
         }
     }
 }
