@@ -113,8 +113,9 @@ namespace TeamsGameMode
 
         public void SelectGamemode(int index)
         {
-            print("LOADING GAMEMODE: " + TGM_Manager.gamemodes[index].name);
+            TeamGameModePlugin.Logger.LogMessage($"Gamemode Selected: " + TGM_Manager.gamemodes[index].name);
             TGM_Manager.instance.gamemode = TGM_Manager.gamemodes[index];
+            TGM_Manager.profile = TGM_Manager.instance.gamemode.LoadDefaultProfile();
             OpenPage(Page.GameSettings);
             UpdateSettings();
             TGM_Manager.instance.SetGameState(TGM_Manager.GameStateEnum.Setup);
@@ -189,6 +190,7 @@ namespace TeamsGameMode
         {
             TGM_Manager.instance.SetGameState(TGM_Manager.GameStateEnum.Gameplay);
             OpenPage(Page.JoinTeam);
+            TeamGameModePlugin.Logger.LogMessage($"Game Started");
         }
     }
 }

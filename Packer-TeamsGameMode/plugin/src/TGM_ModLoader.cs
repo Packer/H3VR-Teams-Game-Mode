@@ -131,14 +131,15 @@ namespace TeamsGameMode
                     //Add to our item category pool
                     playerTeams.Add(team);
                     string newDirectory = directories[i];
-                    newDirectory = newDirectory.Remove(newDirectory.Length - 5);
-                    team.thumbnail = LoadSprite(newDirectory + "png");
+                    newDirectory = newDirectory.Replace("pttgm", "png");
+                    team.thumbnail = LoadSprite(newDirectory);
 
                     //Class Icons
                     for (int x = 0; x < team.playerClasses.Length; x++)
                     {
                         string nameFixed = team.playerClasses[x].name.Replace(" ", "_");
-                        team.playerClasses[x].thumbnail = LoadSprite(newDirectory + "_" + nameFixed + "png");
+                        newDirectory = newDirectory.Replace(".png", "");
+                        team.playerClasses[x].thumbnail = LoadSprite(newDirectory + "_" + nameFixed + ".png");
                     }
 
                     TeamGameModePlugin.Logger.LogMessage($"Loaded Player Team - " + team.name);
@@ -185,7 +186,7 @@ namespace TeamsGameMode
                     //Add to our item category pool
                     sosigTeams.Add(team);
                     string newDirectory = directories[i];
-                    newDirectory = newDirectory.Remove(newDirectory.Length - 5) + "png";
+                    newDirectory = newDirectory.Replace("sttgm", "png");
                     team.thumbnail = LoadSprite(newDirectory);
 
                     TeamGameModePlugin.Logger.LogMessage($"Loaded Sosig Team - " + team.name);

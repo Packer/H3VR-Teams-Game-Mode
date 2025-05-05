@@ -19,6 +19,15 @@ namespace TeamsGameMode
         public string description;
         public Sprite thumbnail;
 
+        public virtual TGM_Profile LoadDefaultProfile()
+        {
+            TGM_Profile profile = new TGM_Profile();
+            profile.gameSettings = new int[Enum.GetNames(typeof(SettingEnum)).Length];
+            profile.gameSettings[(int)SettingEnum.SpawnLock] = 2;   //Per Class Spawn Locking
+
+            return profile;
+        }
+
         /// <summary>
         /// Called when gamemode is selected
         /// </summary>

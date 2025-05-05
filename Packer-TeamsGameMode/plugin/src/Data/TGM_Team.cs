@@ -13,8 +13,10 @@ public class TGM_Team
 
     public string teamName; //Currently Unused, should be a Team Color Name
     public int iff; //Matches the array index, for internal access
-    public TGM_PlayerTeam playerTeam;   //Player Team
-    public TGM_SosigTeam sosigTeam;     //Sosig Team
+    public int playerTeam = 0;
+    public int sosigTeam = 0;
+    //public TGM_PlayerTeam playerTeam;   //Player Team
+    //public TGM_SosigTeam sosigTeam;     //Sosig Team
     public int sosigCount = 8;      //Total amount of sosigs on this team
     public int scoreGoal = 80;
     public List<Sosig> sosigs = new List<Sosig>();
@@ -42,6 +44,16 @@ public class TGM_Team
                 color = Color.blue;
                 break;
         }
+    }
+
+    public TGM_PlayerTeam GetPlayerTeam()
+    {
+        return TGM_ModLoader.playerTeams[playerTeam];
+    }
+
+    public TGM_SosigTeam GetSosigTeam()
+    {
+        return TGM_ModLoader.sosigTeams[sosigTeam];
     }
 
     /// <summary>
@@ -109,18 +121,20 @@ public class TGM_Team
         {
             List<TGM_SosigTeam.SosigSet> sets = new List<TGM_SosigTeam.SosigSet>();
 
-            for (int i = 0; i < sosigTeam.sosigSet.Length; i++)
+            TGM_SosigTeam selectedSosigTeam = TGM_ModLoader.sosigTeams[sosigTeam];
+
+            for (int i = 0; i < selectedSosigTeam.sosigSet.Length; i++)
             {
-                if (currentKills > sosigTeam.sosigSet[i].minKills
-                    && currentKills <= sosigTeam.sosigSet[i].maxKills)
+                if (currentKills > selectedSosigTeam.sosigSet[i].minKills
+                    && currentKills <= selectedSosigTeam.sosigSet[i].maxKills)
                 {
-                    sets.Add(sosigTeam.sosigSet[i]);
+                    sets.Add(selectedSosigTeam.sosigSet[i]);
                 }
             }
 
             //Backup make sure we have at least ONE sosig set
             if (sets.Count <= 0)
-                sets.Add(sosigTeam.sosigSet[0]);
+                sets.Add(selectedSosigTeam.sosigSet[0]);
 
             TGM_SosigTeam.SosigSet selectedSet = sets[Random.Range(0, sets.Count)];
             sosigID = selectedSet.sosigEnemyIDs[Random.Range(0, selectedSet.sosigEnemyIDs.Length)];

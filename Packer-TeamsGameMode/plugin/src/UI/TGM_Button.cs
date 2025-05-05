@@ -42,7 +42,6 @@ namespace TeamsGameMode
 
         public void ChooseGamemode()
         {
-            print("PRESS GAMEMODE BUTTOn");
             TGM_MainMenu.instance.SelectGamemode(index);
 
             TGM_Manager.PlayAudio(TGM_Manager.PlayAudioEnum.Confirm);

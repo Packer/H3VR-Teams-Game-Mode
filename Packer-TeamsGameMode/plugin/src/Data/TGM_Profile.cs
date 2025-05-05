@@ -7,10 +7,11 @@ namespace TeamsGameMode
 {
     public class TGM_Profile
     {
-        public string name;
+        public string name = "New Profile";
         public List<string> playerTeams;
         public List<string> sosigTeams;
 
+        public int gamemode = 0;
         public int[] gameSettings;
         public int[] gamemodeSettings;
     }

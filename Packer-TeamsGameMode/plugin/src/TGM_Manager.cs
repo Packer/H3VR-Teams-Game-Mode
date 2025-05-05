@@ -44,7 +44,6 @@ namespace TeamsGameMode
         [Tooltip("Player's Team Lost")]
         public AudioClip audioTeamLost;
 
-
         public delegate void GameStateDelegate();
         public static event GameStateDelegate GameStateEvent;
 
@@ -64,14 +63,16 @@ namespace TeamsGameMode
                 team[i] = new TGM_Team();
 
                 //Default to first in the list
-                team[i].playerTeam = TGM_ModLoader.playerTeams[0];
-                team[i].sosigTeam = TGM_ModLoader.sosigTeams[0];
+                team[i].playerTeam = 0;
+                team[i].sosigTeam = 0;
             }
 
             //Setup our other systems
             TGM_TeamSetup.instance.Setup();
             TGM_MainMenu.instance.Setup();
             TGM_ProfileMenu.instance.Setup();
+
+            TeamGameModePlugin.Logger.LogMessage($"Setup Complete");
         }
 
         void Awake()
@@ -81,10 +82,11 @@ namespace TeamsGameMode
 
         void Start()
         {
-            TGM_TeamDeathmatch teamDeathmatch = new TGM_TeamDeathmatch("Team Deathmatch", "2 Teams fight to the death", null);
             if (gamemodes == null)
                 gamemodes = new List<TGM_Gamemode>();
-            gamemodes.Add(teamDeathmatch);
+
+            TGM_TeamDeathmatch teamDeathmatch = new TGM_TeamDeathmatch("Team Deathmatch", "2 Teams fight to the death", null);
+            AddGamemode(teamDeathmatch);
 
             GamemodesLoadedEvent?.Invoke();
         }
@@ -95,9 +97,21 @@ namespace TeamsGameMode
                 gamemode.Update();
         }
 
+        public void AddGamemode(TGM_Gamemode gamemode)
+        {
+            for (int i = 0; i < gamemodes.Count; i++)
+            {
+                if (gamemodes[i].name == gamemode.name)
+                    return;
+            }
+            gamemodes.Add(gamemode);
+        }
+
         public void SetGameState(GameStateEnum state)
         {
             gameState = state;
+
+            TeamGameModePlugin.Logger.LogMessage($"Set Game State: " + state.ToString());
 
             if (GameStateEvent != null)
                 GameStateEvent.Invoke();
@@ -228,9 +242,9 @@ namespace TeamsGameMode
         {
             GamemodeSelect,
             Setup,
-            Pregame,      //Countdown to game start
+            Pregame,    //Countdown to game start
             Gameplay,
-            Postgame,     //30 secs post game before game over
+            Postgame,   //30 secs post game before game over
             Gameover,   //Put everyone back into start room
         }
     }

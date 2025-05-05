@@ -42,7 +42,7 @@ namespace TeamsGameMode
 
         void Start()
         {
-            Setup(TGM_Manager.instance.team[GM.CurrentPlayerBody.GetPlayerIFF()].playerTeam.playerClasses);
+            Setup(TGM_Manager.instance.team[GM.CurrentPlayerBody.GetPlayerIFF()].GetPlayerTeam().playerClasses);
         }
 
         void Update()
@@ -88,15 +88,19 @@ namespace TeamsGameMode
 
             //Spawn Locking Per class?
             if (TGM_Manager.profile.gameSettings[(int)SettingEnum.SpawnLock] == 2)
-                GM.CurrentSceneSettings.IsSpawnLockingEnabled = TGM_Manager.instance.team[team].playerTeam.playerClasses[id].canSpawnLock;
+            {
+                GM.CurrentSceneSettings.IsSpawnLockingEnabled = TGM_Manager.instance.team[team].GetPlayerTeam().playerClasses[id].canSpawnLock;
+            }
             else
+            {
                 GM.CurrentSceneSettings.IsSpawnLockingEnabled = TGM_Manager.profile.gameSettings[(int)SettingEnum.SpawnLock] >= 1 ? true : false;
+            }
 
             //Set Player Health
             int healthSetting = TGM_Manager.profile.gameSettings[(int)SettingEnum.PlayerHealth];
             //If -1 use player class health otherwise use global setting
             if (healthSetting == -1)
-                healthSetting = TGM_Manager.instance.team[team].playerTeam.playerClasses[id].playerHealth;
+                healthSetting = TGM_Manager.instance.team[team].GetPlayerTeam().playerClasses[id].playerHealth;
             GM.CurrentPlayerBody.SetHealthThreshold(healthSetting);
 
             //Despawn any previously owned / held items
@@ -104,8 +108,14 @@ namespace TeamsGameMode
 
             //Spawn all weapons / items
             TGM_PlayerClass.SubClass subClass 
-                = TGM_Manager.instance.team[team].playerTeam.playerClasses[id].subClasses[
-                    Random.Range(0, TGM_Manager.instance.team[team].playerTeam.playerClasses[id].subClasses.Length)];
+                = TGM_Manager.instance.team[team].GetPlayerTeam().playerClasses[id].subClasses[
+                    Random.Range(0, TGM_Manager.instance.team[team].GetPlayerTeam().playerClasses[id].subClasses.Length)];
+
+            //Spawn Locking
+            if (TGM_Manager.profile.gameSettings[(int)SettingEnum.SpawnLock] == 2)
+                GM.CurrentSceneSettings.IsSpawnLockingEnabled = TGM_Manager.instance.team[team].GetPlayerTeam().playerClasses[id].canSpawnLock;
+            else
+                GM.CurrentSceneSettings.IsSpawnLockingEnabled = TGM_Manager.profile.gameSettings[(int)SettingEnum.SpawnLock] == 0 ? false : true;
 
             //Spawn our sub classes items
             for (int x = 0; x < subClass.items.Length; x++)

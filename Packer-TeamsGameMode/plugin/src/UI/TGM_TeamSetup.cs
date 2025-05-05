@@ -47,6 +47,10 @@ namespace TeamsGameMode
         private int browserMode = 0;
         private int browserIndex = 0;
 
+        void Awake()
+        {
+            instance = this;
+        }
 
         public void Setup()
         {
@@ -75,15 +79,18 @@ namespace TeamsGameMode
             //Color
             teamBackground.color = selectedTeam.color;
 
+
             //Player Team
-            teamTitle.text = selectedTeam.playerTeam.name;
-            teamDescription.text = selectedTeam.playerTeam.name;
-            teamThumbnail.sprite = selectedTeam.playerTeam.thumbnail;
+            TGM_PlayerTeam team = selectedTeam.GetPlayerTeam();
+            teamTitle.text = team.name;
+            teamDescription.text = team.name;
+            teamThumbnail.sprite = team.thumbnail;
 
             //Sosig Team
-            sosigTitle.text = selectedTeam.sosigTeam.name;
-            sosigDescription.text = selectedTeam.sosigTeam.description;
-            teamThumbnail.sprite = selectedTeam.sosigTeam.thumbnail;
+            TGM_SosigTeam sosigTeam = selectedTeam.GetSosigTeam();
+            sosigTitle.text = sosigTeam.name;
+            sosigDescription.text = sosigTeam.description;
+            teamThumbnail.sprite = sosigTeam.thumbnail;
 
             //Player Classes
             //Clear old Images
@@ -93,10 +100,10 @@ namespace TeamsGameMode
             }
             classPreviews.Clear();
             //Create new Images
-            for (int i = 0; i < selectedTeam.playerTeam.playerClasses.Length; i++)
+            for (int i = 0; i < team.playerClasses.Length; i++)
             {
                 Image img = Instantiate(classesThumbnailPrefab, classesThumbnailPrefab.transform.parent).GetComponent<Image>();
-                img.sprite = selectedTeam.playerTeam.playerClasses[i].thumbnail;
+                img.sprite = team.playerClasses[i].thumbnail;
                 classPreviews.Add(img);
             }
 
@@ -144,14 +151,16 @@ namespace TeamsGameMode
         public void OpenBrowser(int type)
         {
             browserMode = type;
+            TGM_PlayerTeam team = selectedTeam.GetPlayerTeam();
+            TGM_SosigTeam sosigTeam = selectedTeam.GetSosigTeam();
 
             browserPanel.SetActive(true);
             if (type == 0)
             {
                 //Select Player Team
-                browserTitle.text = selectedTeam.playerTeam.name;
-                browserDescription.text = selectedTeam.playerTeam.description;
-                browserThumbnail.sprite = selectedTeam.playerTeam.thumbnail;
+                browserTitle.text = team.name;
+                browserDescription.text = team.description;
+                browserThumbnail.sprite = team.thumbnail;
 
                 for (int i = 0; i < TGM_ModLoader.playerTeams.Count; i++)
                 {
@@ -165,9 +174,9 @@ namespace TeamsGameMode
             else
             {
                 //Select Sosig Team
-                browserTitle.text = selectedTeam.sosigTeam.name;
-                browserDescription.text = selectedTeam.sosigTeam.description;
-                browserThumbnail.sprite = selectedTeam.sosigTeam.thumbnail;
+                browserTitle.text = sosigTeam.name;
+                browserDescription.text = sosigTeam.description;
+                browserThumbnail.sprite = sosigTeam.thumbnail;
 
                 for (int i = 0; i < TGM_ModLoader.sosigTeams.Count; i++)
                 {
@@ -206,11 +215,11 @@ namespace TeamsGameMode
         {
             if (browserMode == 0)
             {
-                selectedTeam.playerTeam = TGM_ModLoader.playerTeams[browserIndex];
+                selectedTeam.playerTeam = browserIndex;
             }
             else
             {
-                selectedTeam.sosigTeam = TGM_ModLoader.sosigTeams[browserIndex];
+                selectedTeam.sosigTeam = browserIndex;
             }
 
             browserPanel.SetActive(false);

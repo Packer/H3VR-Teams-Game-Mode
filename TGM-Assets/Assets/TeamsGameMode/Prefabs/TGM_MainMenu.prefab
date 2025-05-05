@@ -3402,7 +3402,7 @@ MonoBehaviour:
     - Enabled (Global)
     - Set Per Class
     type: 0
-    value: 0
+    value: 2
     intMin: 0
     intMax: 0
     localOnly: 0

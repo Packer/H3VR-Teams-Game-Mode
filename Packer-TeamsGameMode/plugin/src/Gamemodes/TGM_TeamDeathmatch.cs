@@ -18,6 +18,14 @@ namespace TeamsGameMode
             thumbnail = modeThumbnail;
         }
 
+        public override TGM_Profile LoadDefaultProfile()
+        {
+            TGM_Profile profile = base.LoadDefaultProfile();
+            //Do custom default settings here
+
+            return profile;
+        }
+
         public override void Setup()
         {
             base.Setup();
