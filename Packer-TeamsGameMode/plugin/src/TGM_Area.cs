@@ -1,4 +1,5 @@
-﻿using System;
+﻿using FistVR;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -38,6 +39,57 @@ namespace TeamsGameMode
         [Tooltip("Neutral Objects that are enabled when owned by no team, e.g. Door on unused spawn room")]
         public GameObject[] neutralObjects;
 
+
+        public void UpdateArea()
+        {
+            int playerIFF = GM.CurrentPlayerBody.GetPlayerIFF();
+            //Ally/Friendly
+            if (iff == playerIFF)
+            {
+                for (int i = 0; i < friendlyObjects.Length; i++)
+                {
+                    friendlyObjects[i].SetActive(true);
+                }
+                for (int i = 0; i < enemyObjects.Length; i++)
+                {
+                    enemyObjects[i].SetActive(false);
+                }
+                for (int i = 0; i < neutralObjects.Length; i++)
+                {
+                    neutralObjects[i].SetActive(false);
+                }
+            }
+            else if (iff != playerIFF) //Enemy
+            {
+                for (int i = 0; i < friendlyObjects.Length; i++)
+                {
+                    friendlyObjects[i].SetActive(false);
+                }
+                for (int i = 0; i < enemyObjects.Length; i++)
+                {
+                    enemyObjects[i].SetActive(true);
+                }
+                for (int i = 0; i < neutralObjects.Length; i++)
+                {
+                    neutralObjects[i].SetActive(false);
+                }
+            }
+            else //Neutral
+            {
+                for (int i = 0; i < friendlyObjects.Length; i++)
+                {
+                    friendlyObjects[i].SetActive(false);
+                }
+                for (int i = 0; i < enemyObjects.Length; i++)
+                {
+                    enemyObjects[i].SetActive(false);
+                }
+                for (int i = 0; i < neutralObjects.Length; i++)
+                {
+                    neutralObjects[i].SetActive(true);
+                }
+            }
+        }
 
         /// <summary>
         /// Returns 2 patrol points and 3rd index as rotation 

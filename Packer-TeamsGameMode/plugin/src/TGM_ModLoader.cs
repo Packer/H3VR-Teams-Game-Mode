@@ -137,9 +137,9 @@ namespace TeamsGameMode
                     //Class Icons
                     for (int x = 0; x < team.playerClasses.Length; x++)
                     {
-                        string nameFixed = team.playerClasses[x].name.Replace(" ", "_");
-                        newDirectory = newDirectory.Replace(".png", "");
-                        team.playerClasses[x].thumbnail = LoadSprite(newDirectory + "_" + nameFixed + ".png");
+                        //string nameFixed = team.playerClasses[x].name.Replace(" ", "_");
+                        string pathName = Path.GetDirectoryName(newDirectory);
+                        team.playerClasses[x].thumbnail = LoadSprite(pathName + "\\" + team.playerClasses[x].spriteName);
                     }
 
                     TeamGameModePlugin.Logger.LogMessage($"Loaded Player Team - " + team.name);

@@ -9,8 +9,6 @@ namespace TeamsGameMode
     [Serializable]
     public class TGM_TeamDeathmatch : TGM_Gamemode
     {
-        public TGM_Area[] teamAreas;
-
         public TGM_TeamDeathmatch(string modeName = "", string modeDescription = "", Sprite modeThumbnail = null)
         {
             name = modeName;
@@ -29,7 +27,11 @@ namespace TeamsGameMode
         public override void Setup()
         {
             base.Setup();
-
+            //Defaults
+            for (int i = 0; i < 2; i++)
+            {
+                TGM_Manager.instance.team[i].scoreGoal = 60;
+            }
         }
 
         public override bool IsGamemodeValid()
@@ -42,6 +44,7 @@ namespace TeamsGameMode
         public override void Update()
         {
             base.Update();
+            RespawnTime();
 
             if (Networking.IsClient())
                 return;
@@ -59,6 +62,12 @@ namespace TeamsGameMode
             }    
         }
 
+        public override void OnPlayerKilled(int playerIndex, int killerIFF)
+        {
+            base.OnPlayerKilled(playerIndex, killerIFF);
+            TGM_Manager.instance.localPlayer.deaths++;
+        }
+
         public override void OnSosigCreate(Sosig s)
         {
             base.OnSosigCreate(s);
@@ -74,10 +83,11 @@ namespace TeamsGameMode
         public override void OnSosigKilled(Sosig s)
         {
             base.OnSosigKilled(s);
-
+            if(s.GetDiedFromIFF() == 0 || s.GetDiedFromIFF() == 1)
+                TGM_Manager.instance.team[s.GetDiedFromIFF()].currentKills++;
             int iff = s.GetIFF();
-
             AdjustTeamScore(iff, 1);
+            TGM_Manager.instance.localPlayer.kills++;
         }
     }
 }

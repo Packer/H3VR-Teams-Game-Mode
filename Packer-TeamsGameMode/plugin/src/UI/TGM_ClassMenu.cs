@@ -10,7 +10,7 @@ namespace TeamsGameMode
         public static TGM_ClassMenu instance;
 
         [Header("Menu")]
-        public Text spawnCountdown;
+        public Text spawnButtonText;
         public GameObject buttonPrefab;
         public Transform buttonContent;
 
@@ -47,8 +47,10 @@ namespace TeamsGameMode
 
         void Update()
         {
-            if (spawnCountdown.gameObject.activeSelf)
-                spawnCountdown.text = TGM_Manager.instance.nextSpawnWave.ToString();
+            if (TGM_Manager.instance.localPlayer.awaitingRespawn)
+            {
+                spawnButtonText.text = Mathf.Abs((Time.time - TGM_Manager.instance.team[TGM_Manager.instance.localPlayer.iff].respawnTime)).ToString("F2");
+            }
         }
 
 
@@ -73,7 +75,17 @@ namespace TeamsGameMode
 
         public void JoinRespawn()
         {
-            TGM_Manager.instance.localPlayer.awaitingRespawn = true;
+            if (TGM_Manager.instance.localPlayer.awaitingRespawn == false)
+            {
+                TGM_Manager.instance.localPlayer.awaitingRespawn = true;
+                SM.PlayGlobalUISound(SM.GlobalUISound.Beep, GM.CurrentPlayerBody.transform.position);
+            }
+            else
+            {
+                TGM_Manager.instance.localPlayer.awaitingRespawn = false;
+                spawnButtonText.text = "Spawn";
+                SM.PlayGlobalUISound(SM.GlobalUISound.Boop, GM.CurrentPlayerBody.transform.position);
+            }
         }
 
         public void SpawnClass(int id)
@@ -102,6 +114,7 @@ namespace TeamsGameMode
             if (healthSetting == -1)
                 healthSetting = TGM_Manager.instance.team[team].GetPlayerTeam().playerClasses[id].playerHealth;
             GM.CurrentPlayerBody.SetHealthThreshold(healthSetting);
+            GM.CurrentPlayerBody.Health = healthSetting;
 
             //Despawn any previously owned / held items
             TGM_Manager.instance.localPlayer.DestroyPlayersItems();

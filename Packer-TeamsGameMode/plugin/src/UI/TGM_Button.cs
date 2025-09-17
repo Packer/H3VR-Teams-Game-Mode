@@ -74,7 +74,7 @@ namespace TeamsGameMode
                 spawn.rotation.eulerAngles);
 
 
-            Instantiate(TGM_ModLoader.tgmAssets.classMenu, spawn.position, spawn.rotation);
+            Instantiate(TGM_ModLoader.tgmAssets.classMenu, spawn.position + (Vector3.up * 1.25f), spawn.rotation);
 
             TGM_Manager.PlayAudio(TGM_Manager.PlayAudioEnum.Confirm);
         }

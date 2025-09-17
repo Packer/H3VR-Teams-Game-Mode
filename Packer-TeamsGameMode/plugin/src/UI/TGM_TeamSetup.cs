@@ -56,11 +56,25 @@ namespace TeamsGameMode
         {
             //Default select first team
             SelectTeam(0);
+
+            //Setup Spawn points
+            for (int i = 0; i < TGM_Manager.instance.team.Length; i++)
+            {
+                TGM_Manager.instance.team[i].currentSpawnArea = TGM_Scene.instance.teams[i].startSpawnArea;
+            }
+
+            //Update all areas
+            for (int i = 0; i < TGM_Scene.instance.areas.Length; i++)
+            {
+                TGM_Scene.instance.areas[i].UpdateArea();
+            }
+
         }
 
         public void SelectTeam(int iff)
         {
             selectedTeam = TGM_Manager.instance.team[iff];
+            TGM_Manager.instance.localPlayer.iff = iff;
             UpdateSettings();
         }
 

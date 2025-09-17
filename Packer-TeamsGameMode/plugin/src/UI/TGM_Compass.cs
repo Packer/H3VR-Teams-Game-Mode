@@ -20,6 +20,11 @@ namespace TeamsGameMode
         public Text deathText;
         public Text scoreText;
 
+        [Header("Teams")]
+        public Text redScoreText;
+        public Text blueScoreText;
+        public Transform scorePanel;
+
         [Header("Markers")]
         public Marker[] markers;
 
@@ -87,6 +92,14 @@ namespace TeamsGameMode
                 markers[i].LookAtTarget();
             }
 
+            //Stats
+            killText.text = TGM_Manager.instance.localPlayer.kills.ToString();
+            deathText.text = TGM_Manager.instance.localPlayer.deaths.ToString();
+
+            int playerIFF = TGM_Manager.instance.localPlayer.iff;
+            if(playerIFF == 0 || playerIFF ==1)
+                scoreText.text = TGM_Manager.instance.team[playerIFF].currentScore.ToString();
+
             //Health
             healthFill.fillAmount = GM.GetPlayerHealth();
             healthFill.color = Color.Lerp(healthEmpty, healthFull, GM.GetPlayerHealth());
@@ -94,7 +107,16 @@ namespace TeamsGameMode
             //Direction
             directionNeedle.LookAt(GM.CurrentPlayerBody.Head.position);
             directionText.text = Mathf.FloorToInt(directionNeedle.eulerAngles.y).ToString();
-            directionNeedle.rotation = Quaternion.Euler(0,0, directionNeedle.eulerAngles.z);
+            directionNeedle.rotation = Quaternion.Euler(90, directionNeedle.eulerAngles.y + 180, 0);
+
+            //Team Score - If the panel is enabled
+            if (scorePanel.gameObject.activeSelf)
+            {
+                scorePanel.LookAt(GM.CurrentPlayerBody.Head.position);
+                scorePanel.rotation = Quaternion.Euler(90, scorePanel.eulerAngles.y + 180, 0);
+                redScoreText.text = TGM_Manager.instance.team[0].currentScore.ToString();
+                blueScoreText.text = TGM_Manager.instance.team[1].currentScore.ToString();
+            }
 
         }
     }

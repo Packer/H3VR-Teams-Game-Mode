@@ -6,6 +6,7 @@ using System.Text;
 using UnityEngine;
 using UnityEngine.UI;
 using H3MP.Networking;
+using FistVR;
 
 namespace TeamsGameMode
 {
@@ -115,10 +116,17 @@ namespace TeamsGameMode
         {
             TeamGameModePlugin.Logger.LogMessage($"Gamemode Selected: " + TGM_Manager.gamemodes[index].name);
             TGM_Manager.instance.gamemode = TGM_Manager.gamemodes[index];
+            GM.CurrentSceneSettings.SosigKillEvent += TGM_Manager.instance.gamemode.OnSosigKilled;
             TGM_Manager.profile = TGM_Manager.instance.gamemode.LoadDefaultProfile();
             OpenPage(Page.GameSettings);
             UpdateSettings();
             TGM_Manager.instance.SetGameState(TGM_Manager.GameStateEnum.Setup);
+        }
+
+        void OnDisable()
+        {
+            GM.CurrentSceneSettings.SosigKillEvent -= TGM_Manager.instance.gamemode.OnSosigKilled;
+            //GM.CurrentSceneSettings.PlayerDeathFromIFFEvent -= TGM_Manager.instance.gamemode.OnPlayerKilled;
         }
 
         //-------------------------------------------------------------------------------------

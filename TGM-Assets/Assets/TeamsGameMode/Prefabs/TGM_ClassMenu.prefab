@@ -1084,7 +1084,7 @@ MonoBehaviour:
   m_Script: {fileID: -533952551, guid: 2dad86f9e6b5aece0f7796226ce8c243, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  spawnCountdown: {fileID: 114660688131199574}
+  spawnButtonText: {fileID: 114995832523218150}
   buttonPrefab: {fileID: 1136051491821546}
   buttonContent: {fileID: 224751269271357098}
   mainSpawns:

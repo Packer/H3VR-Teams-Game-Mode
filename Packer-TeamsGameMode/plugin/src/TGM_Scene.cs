@@ -52,6 +52,8 @@ namespace TeamsGameMode
             public TGM_Area startSpawnArea;
             [Tooltip("Recommended Team Objective Score for this team, set to 0 or less to use default")]
             public int teamScore = 0;
+            [Tooltip("The time between wave respawns, attacking teams should have lower than defending")]
+            public float teamSpawnTime = 5f;
         }
 
         /// <summary>
@@ -66,7 +68,6 @@ namespace TeamsGameMode
 
             return instance.teams[iff];
         }
-
 
         public static Transform GetTeamSpawnRoomTransform(int team)
         {

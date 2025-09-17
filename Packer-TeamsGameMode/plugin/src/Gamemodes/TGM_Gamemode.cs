@@ -24,6 +24,7 @@ namespace TeamsGameMode
             TGM_Profile profile = new TGM_Profile();
             profile.gameSettings = new int[Enum.GetNames(typeof(SettingEnum)).Length];
             profile.gameSettings[(int)SettingEnum.SpawnLock] = 2;   //Per Class Spawn Locking
+            profile.gameSettings[(int)SettingEnum.PlayerHealth] = -1;   //Per Class Health
 
             return profile;
         }
@@ -116,6 +117,23 @@ namespace TeamsGameMode
         public virtual void OnPlayerKilled(int playerIndex, int killerIFF)
         {
             AdjustTeamScore(GM.CurrentPlayerBody.GetPlayerIFF(), 1);
+        }
+
+        /// <summary>
+        /// A base respawning timer for each team
+        /// </summary>
+        public virtual void RespawnTime()
+        {
+            for (int i = 0; i < TGM_Manager.instance.team.Length; i++)
+            {
+                if (Time.time >= TGM_Manager.instance.team[i].respawnTime)
+                {
+                    TGM_Manager.instance.team[i].Respawn();
+                    TGM_Manager.instance.team[i].respawnTime = Time.time + TGM_Scene.instance.teams[i].teamSpawnTime;
+                    Debug.Log("Respawn triggered at " + Time.time + " for team " + i);
+                }
+
+            }
         }
     }
 }

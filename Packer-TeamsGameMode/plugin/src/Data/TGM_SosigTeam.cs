@@ -18,6 +18,7 @@ namespace TeamsGameMode
         public Sprite thumbnail;
         public SosigSet[] sosigSet;
 
+        [Serializable]
         public class SosigSet
         {
             public int minKills = -1;

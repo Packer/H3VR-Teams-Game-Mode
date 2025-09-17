@@ -6,6 +6,7 @@ using Sodalite.Api;
 using Random = UnityEngine.Random;
 
 namespace TeamsGameMode;
+
 public class TGM_Team
 {
     public delegate void CreateSosigDelegate(Sosig s);
@@ -27,24 +28,10 @@ public class TGM_Team
     public int currentScore = 80;
     public TGM_Area currentSpawnArea;
 
-    public TGM_Team()
-    {
-        color = Color.HSVToRGB(0.125f * iff, 1f, 1f);
-
-        //Hard Code teams
-        switch (iff)
-        {
-            default:
-            case 0:
-                teamName = "Red";
-                color = Color.red;
-                break;
-            case 1:
-                teamName = "Blue";
-                color = Color.blue;
-                break;
-        }
-    }
+    /// <summary>
+    /// The time which respawning occurs
+    /// </summary>
+    public float respawnTime = 0;
 
     public TGM_PlayerTeam GetPlayerTeam()
     {
@@ -62,6 +49,7 @@ public class TGM_Team
     public void Respawn()
     {
         int localIFF = GM.CurrentPlayerBody.GetPlayerIFF();
+
         //Spawn Local Player
         if (localIFF == iff
             && TGM_Manager.instance.localPlayer.awaitingRespawn)
@@ -77,7 +65,7 @@ public class TGM_Team
             int sosigRemain = sosigCount - sosigs.Count;
             SosigAPI.SpawnOptions _spawnOptions = new SosigAPI.SpawnOptions
             {
-                SpawnState = Sosig.SosigOrder.PathTo,
+                SpawnState = Sosig.SosigOrder.Assault,
                 SpawnActivated = true,
                 EquipmentMode = SosigAPI.SpawnOptions.EquipmentSlots.All,
                 SpawnWithFullAmmo = true,
@@ -86,24 +74,8 @@ public class TGM_Team
 
             for (int i = 0; i < sosigRemain; i++)
             {
-                Transform spawnArea = currentSpawnArea.spawnPoints[Random.Range(0, currentSpawnArea.spawnPoints.Length)];
-                Vector3 spawnScale = spawnArea.localScale / 2;
-                Vector3 spawnPoint
-                    = spawnArea.position
-                    + new Vector3(
-                        Random.Range(-spawnScale.x, spawnScale.x),
-                        Random.Range(-spawnScale.y, spawnScale.y),
-                        Random.Range(-spawnScale.z, spawnScale.z));
-
-                //Validate Sosig Spawn
-                NavMeshHit hit;
-                if (NavMesh.SamplePosition(spawnPoint, out hit, Mathf.Max(spawnScale.y * 2, 1f), NavMesh.AllAreas))
-                    spawnPoint = hit.position;
-                else
-                {
-                    TeamGameModePlugin.Logger.LogMessage($"Invalid Sosig Spawn Point: " + spawnArea.name);
-                    continue;
-                }
+                Transform spawnArea = currentSpawnArea.sosigSpawnPoints[Random.Range(0, currentSpawnArea.sosigSpawnPoints.Length)];
+                Vector3 spawnPoint = Global.GetValidSpawnPoint(spawnArea);
 
                 Sosig s = CreateTeamSosig(_spawnOptions, spawnPoint, spawnArea.rotation);
 
@@ -113,7 +85,6 @@ public class TGM_Team
         }
     }
 
-
     public Sosig CreateTeamSosig(SosigAPI.SpawnOptions spawnOptions, Vector3 position, Quaternion rotation, int sosigID = -2)
     {
         //If not custom sosig, use team ID
@@ -122,6 +93,17 @@ public class TGM_Team
             List<TGM_SosigTeam.SosigSet> sets = new List<TGM_SosigTeam.SosigSet>();
 
             TGM_SosigTeam selectedSosigTeam = TGM_ModLoader.sosigTeams[sosigTeam];
+
+            if (selectedSosigTeam == null)
+            {
+                Debug.Log("MISSING SOSIG TEAM");
+                return null;
+            }
+            if (selectedSosigTeam.sosigSet == null)
+            {
+                Debug.Log("MISSING SOSIG SET");
+                return null;
+            }
 
             for (int i = 0; i < selectedSosigTeam.sosigSet.Length; i++)
             {

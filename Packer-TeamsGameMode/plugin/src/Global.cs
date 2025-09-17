@@ -36,12 +36,12 @@ namespace TeamsGameMode
             Vector3 scale = transform.localScale;
             Vector3 randomPosition
                 = new Vector3(
-                    Random.Range(-scale.x, scale.x),
-                    Random.Range(-scale.y, scale.y),
-                    Random.Range(-scale.z, scale.z));
+                    Random.Range(-scale.x * 0.5f, scale.x * 0.5f),
+                    Random.Range(-scale.y * 0.5f, scale.y * 0.5f),
+                    Random.Range(-scale.z * 0.5f, scale.z * 0.5f));
 
             //Assign Position
-            if (NavMesh.SamplePosition(randomPosition, out NavMeshHit hit, 1f, NavMesh.AllAreas))
+            if (NavMesh.SamplePosition(position + randomPosition, out NavMeshHit hit, scale.y, NavMesh.AllAreas))
                 position = hit.position;
 
             return position;
