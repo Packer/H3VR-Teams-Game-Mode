@@ -47,11 +47,6 @@ namespace TeamsGameMode
             TGM_Manager.PlayAudio(TGM_Manager.PlayAudioEnum.Confirm);
         }
 
-        public void SelectTeamSetup()
-        {
-            TGM_TeamSetup.instance.SelectTeam(index);
-        }
-
         public void SelectProfile()
         {
             TGM_ProfileMenu.instance.SetProfile(texts[0].text);

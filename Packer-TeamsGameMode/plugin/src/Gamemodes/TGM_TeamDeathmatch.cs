@@ -88,6 +88,13 @@ namespace TeamsGameMode
             int iff = s.GetIFF();
             AdjustTeamScore(iff, 1);
             TGM_Manager.instance.localPlayer.kills++;
+
+            //Remove from sosig team count
+            for (int i = 0; i < TGM_Manager.instance.team.Length; i++)
+            {
+                if (TGM_Manager.instance.team[i].sosigs.Contains(s))
+                    TGM_Manager.instance.team[i].sosigs.Remove(s);
+            }
         }
     }
 }

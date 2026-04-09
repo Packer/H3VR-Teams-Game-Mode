@@ -64,6 +64,7 @@ public class TGM_Manager : MonoBehaviour
             //Default to first in the list
             team[i].playerTeam = 0;
             team[i].sosigTeam = 0;
+            team[i].iff = i;
 
             //Basic setup
             //team[i].scoreGoal = gamemode.goal

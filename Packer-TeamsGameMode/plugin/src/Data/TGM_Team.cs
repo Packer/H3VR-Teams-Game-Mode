@@ -18,7 +18,7 @@ public class TGM_Team
     public int sosigTeam = 0;
     //public TGM_PlayerTeam playerTeam;   //Player Team
     //public TGM_SosigTeam sosigTeam;     //Sosig Team
-    public int sosigCount = 8;      //Total amount of sosigs on this team
+    public int sosigLimit = 8;      //Total amount of sosigs on this team
     public int scoreGoal = 80;
     public List<Sosig> sosigs = new List<Sosig>();
     public Color color;
@@ -60,9 +60,9 @@ public class TGM_Team
         }
 
         //Spawn Sosigs
-        if (sosigs.Count < sosigCount)
+        if (sosigs.Count < sosigLimit)
         {
-            int sosigRemain = sosigCount - sosigs.Count;
+            int sosigRemain = sosigLimit - sosigs.Count;
             SosigAPI.SpawnOptions _spawnOptions = new SosigAPI.SpawnOptions
             {
                 SpawnState = Sosig.SosigOrder.Assault,

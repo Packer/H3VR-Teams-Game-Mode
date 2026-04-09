@@ -12,31 +12,6 @@ namespace TeamsGameMode
     {
         public static TGM_TeamSetup instance;
 
-        [Header("Teams")]
-        [SerializeField] Transform teamsBarContent;
-        [SerializeField] GameObject teamsBarPrefab;
-        private List<TGM_Button> teamsButtons = new List<TGM_Button>();
-
-        [SerializeField] TGM_Team selectedTeam;
-        [SerializeField] GameObject addTeamButton;
-        [SerializeField] GameObject removeTeamButton;
-        [SerializeField] Image teamBackground;
-
-        [Header("Player Team")]
-        [SerializeField] Text teamTitle;
-        [SerializeField] Text teamDescription;
-        [SerializeField] Image teamThumbnail;
-
-        [Header("Sosig Team")]
-        [SerializeField] Text sosigTitle;
-        [SerializeField] Text sosigDescription;
-        [SerializeField] Image sosigThumbnail;
-
-        [Header("Classes")]
-        [SerializeField] Transform classesContent;
-        [SerializeField] GameObject classesThumbnailPrefab;
-        private List<Image> classPreviews = new List<Image>();
-
         [Header("Browser")]
         [SerializeField] GameObject browserPanel;
         [SerializeField] GameObject browserButtonPrefab;
@@ -44,7 +19,10 @@ namespace TeamsGameMode
         [SerializeField] Text browserTitle;
         [SerializeField] Text browserDescription;
         [SerializeField] Image browserThumbnail;
+        private List<TGM_Button> browserButtons = new List<TGM_Button>();
+        private int browserTeamID = -1;
         private int browserMode = 0;
+        private int browserTeam = 0;
         private int browserIndex = 0;
 
         void Awake()
@@ -55,7 +33,7 @@ namespace TeamsGameMode
         public void Setup()
         {
             //Default select first team
-            SelectTeam(0);
+            //SelectTeam(0);
 
             //Setup Spawn points
             for (int i = 0; i < TGM_Manager.instance.team.Length; i++)
@@ -71,12 +49,14 @@ namespace TeamsGameMode
 
         }
 
+        /*
         public void SelectTeam(int iff)
         {
             selectedTeam = TGM_Manager.instance.team[iff];
             TGM_Manager.instance.localPlayer.iff = iff;
             UpdateSettings();
         }
+        */
 
         public void SetSosigTeam()
         {
@@ -90,87 +70,61 @@ namespace TeamsGameMode
 
         void UpdateSettings()
         {
-            //Color
-            teamBackground.color = selectedTeam.color;
 
-
-            //Player Team
-            TGM_PlayerTeam team = selectedTeam.GetPlayerTeam();
-            teamTitle.text = team.name;
-            teamDescription.text = team.name;
-            teamThumbnail.sprite = team.thumbnail;
-
-            //Sosig Team
-            TGM_SosigTeam sosigTeam = selectedTeam.GetSosigTeam();
-            sosigTitle.text = sosigTeam.name;
-            sosigDescription.text = sosigTeam.description;
-            teamThumbnail.sprite = sosigTeam.thumbnail;
-
-            //Player Classes
-            //Clear old Images
-            for (int i = 0; i < classPreviews.Count; i++)
-            {
-                Destroy(classPreviews[i].gameObject);
-            }
-            classPreviews.Clear();
-            //Create new Images
-            for (int i = 0; i < team.playerClasses.Length; i++)
-            {
-                Image img = Instantiate(classesThumbnailPrefab, classesThumbnailPrefab.transform.parent).GetComponent<Image>();
-                img.sprite = team.playerClasses[i].thumbnail;
-                classPreviews.Add(img);
-            }
-
-            //Old +2 Teams code
-            /*
-            int teamsMax = TGM_Scene.instance.teams.Length;
-            int teamCount = TGM_Teams.instance.teams.Length;
-
-            if (teamCount < teamsMax)
-                addTeamButton.SetActive(true);
-            else
-                addTeamButton.SetActive(false);
-
-            if (teamCount == teamsMax)
-                removeTeamButton.SetActive(false);
-            else
-                removeTeamButton.SetActive(true);
-
-            //Teams Bar
-            for (int i = 0; i < teamsButtons.Count; i++)
-            {
-                Destroy(teamsButtons[i].gameObject);
-            }
-            teamsButtons.Clear();
-
-            for (int i = 0; i < TGM_Teams.instance.teams.Length; i++)
-            {
-                TGM_Button btn = Instantiate(teamsBarPrefab, teamsBarPrefab.transform).GetComponent<TGM_Button>();
-                btn.gameObject.SetActive(true);
-                teamsButtons.Add(btn);
-            }
-            */
         }
 
-        public void AdjustTeamScore(int amount)
+
+        //RED TEAM
+        public void AdjustRedTeamScore(int amount)
         {
-            selectedTeam.scoreGoal = Mathf.Clamp(selectedTeam.scoreGoal + amount, 1, int.MaxValue);
+            TGM_Manager.instance.team[0].scoreGoal = Mathf.Clamp(TGM_Manager.instance.team[0].scoreGoal + amount, 1, int.MaxValue);
         }
 
-        public void AdjustSosigCount(int amount)
+        public void AdjustRedSosigCount(int amount)
         {
-            selectedTeam.sosigCount = Mathf.Clamp(selectedTeam.sosigCount + amount, 0, 32);
+            TGM_Manager.instance.team[0].sosigLimit = Mathf.Clamp(TGM_Manager.instance.team[0].sosigLimit + amount, 0, 32);
         }
 
-        public void OpenBrowser(int type)
+        public void OpenBrowserRed(int type)
+        {
+            OpenBrowser(type, 0);
+        }
+
+        //BLUE TEAM
+        public void AdjustBlueTeamScore(int amount)
+        {
+            TGM_Manager.instance.team[1].scoreGoal = Mathf.Clamp(TGM_Manager.instance.team[1].scoreGoal + amount, 1, int.MaxValue);
+        }
+
+        public void AdjustBlueSosigCount(int amount)
+        {
+            TGM_Manager.instance.team[1].sosigLimit = Mathf.Clamp(TGM_Manager.instance.team[1].sosigLimit + amount, 0, 32);
+        }
+
+        public void OpenBrowserBlue(int type)
+        {
+            OpenBrowser(type, 1);
+        }
+
+
+        public void OpenBrowser(int type, int teamID)
         {
             browserMode = type;
-            TGM_PlayerTeam team = selectedTeam.GetPlayerTeam();
-            TGM_SosigTeam sosigTeam = selectedTeam.GetSosigTeam();
+            browserTeamID = teamID;
+
+            //Clear old Buttons
+            for (int i = browserButtons.Count - 1; i >= 0; i--)
+            {
+                if (browserButtons[i] != null)
+                    Destroy(browserButtons[i].gameObject);
+            }
+            browserButtons.Clear();
 
             browserPanel.SetActive(true);
             if (type == 0)
             {
+                TGM_PlayerTeam team = TGM_ModLoader.playerTeams[TGM_Manager.instance.team[browserTeamID].playerTeam];
+
                 //Select Player Team
                 browserTitle.text = team.name;
                 browserDescription.text = team.description;
@@ -178,15 +132,17 @@ namespace TeamsGameMode
 
                 for (int i = 0; i < TGM_ModLoader.playerTeams.Count; i++)
                 {
-                    TGM_Button btn = Instantiate(browserButtonPrefab, browserButtonPrefab.transform).GetComponent<TGM_Button>();
+                    TGM_Button btn = Instantiate(browserButtonPrefab, browserContent).GetComponent<TGM_Button>();
                     btn.gameObject.SetActive(true);
                     btn.index = i;
                     btn.buttons[0].image.sprite = TGM_ModLoader.playerTeams[i].thumbnail;
                     btn.texts[0].text = TGM_ModLoader.playerTeams[i].name;
+                    browserButtons.Add(btn);
                 }
             }
             else
             {
+                TGM_SosigTeam sosigTeam = TGM_ModLoader.sosigTeams[TGM_Manager.instance.team[browserTeamID].sosigTeam];
                 //Select Sosig Team
                 browserTitle.text = sosigTeam.name;
                 browserDescription.text = sosigTeam.description;
@@ -194,11 +150,12 @@ namespace TeamsGameMode
 
                 for (int i = 0; i < TGM_ModLoader.sosigTeams.Count; i++)
                 {
-                    TGM_Button btn = Instantiate(browserButtonPrefab, browserButtonPrefab.transform).GetComponent<TGM_Button>();
+                    TGM_Button btn = Instantiate(browserButtonPrefab, browserContent).GetComponent<TGM_Button>();
                     btn.gameObject.SetActive(true);
                     btn.index = i;
                     btn.buttons[0].image.sprite = TGM_ModLoader.sosigTeams[i].thumbnail;
                     btn.texts[0].text = TGM_ModLoader.sosigTeams[i].name;
+                    browserButtons.Add(btn);
                 }
             }
             
@@ -229,12 +186,20 @@ namespace TeamsGameMode
         {
             if (browserMode == 0)
             {
-                selectedTeam.playerTeam = browserIndex;
+                TGM_Manager.instance.team[browserTeamID].playerTeam = browserIndex;
             }
             else
             {
-                selectedTeam.sosigTeam = browserIndex;
+                TGM_Manager.instance.team[browserTeamID].sosigTeam = browserIndex;
             }
+
+            //Clear old Buttons
+            for (int i = browserButtons.Count - 1; i >= 0; i--)
+            {
+                if(browserButtons[i] != null)
+                    Destroy(browserButtons[i].gameObject);
+            }
+            browserButtons.Clear();
 
             browserPanel.SetActive(false);
             UpdateSettings();

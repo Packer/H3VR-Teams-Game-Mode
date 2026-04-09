@@ -130,7 +130,7 @@ namespace TeamsGameMode
                 {
                     TGM_Manager.instance.team[i].Respawn();
                     TGM_Manager.instance.team[i].respawnTime = Time.time + TGM_Scene.instance.teams[i].teamSpawnTime;
-                    Debug.Log("Respawn triggered at " + Time.time + " for team " + i);
+                    //Debug.Log("Respawn triggered at " + Time.time + " for team " + i);
                 }
 
             }

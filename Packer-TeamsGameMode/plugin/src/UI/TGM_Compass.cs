@@ -76,7 +76,7 @@ namespace TeamsGameMode
         void Update()
         {
             //TODO proper checks
-            if (TGM_Manager.instance == null)
+            if (TGM_Manager.instance == null || GM.CurrentPlayerBody == null)
                 return;
 
             //Compass Position
