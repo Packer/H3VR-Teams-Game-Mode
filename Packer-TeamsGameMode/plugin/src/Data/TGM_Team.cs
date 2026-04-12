@@ -44,6 +44,15 @@ public class TGM_Team
     }
 
     /// <summary>
+    /// Returns all Team tracking values back to thier default values
+    /// </summary>
+    public void ResetTeamTracking()
+    {
+        currentKills = 0;
+        currentScore = 0;
+    }
+
+    /// <summary>
     /// Triggered on wave timer
     /// </summary>
     public void Respawn()
@@ -54,7 +63,7 @@ public class TGM_Team
         if (localIFF == iff
             && TGM_Manager.instance.localPlayer.awaitingRespawn)
         {
-            Vector3[] data = currentSpawnArea.GetRandomPlayerSpawnPoint();
+            Vector3[] data = Global.GetRandomPlayerSpawnPoint(currentSpawnArea.spawnPoints);
             GM.CurrentMovementManager.TeleportToPoint(data[0], true, data[1]);
             TGM_Manager.instance.localPlayer.awaitingRespawn = false;
         }
@@ -75,9 +84,8 @@ public class TGM_Team
             for (int i = 0; i < sosigRemain; i++)
             {
                 Transform spawnArea = currentSpawnArea.sosigSpawnPoints[Random.Range(0, currentSpawnArea.sosigSpawnPoints.Length)];
-                Vector3 spawnPoint = Global.GetValidSpawnPoint(spawnArea);
-
-                Sosig s = CreateTeamSosig(_spawnOptions, spawnPoint, spawnArea.rotation);
+                Vector3[] spawnPoint = Global.GetValidSpawnPoint(spawnArea);
+                Sosig s = CreateTeamSosig(_spawnOptions, spawnPoint[0], spawnArea.rotation);
 
                 if (CreateSosigEvent != null)
                     CreateSosigEvent.Invoke(s);
@@ -139,14 +147,35 @@ public class TGM_Team
 
         sosigs.Add(sosig);
 
+        //IF FRIENDLY!
+        if (TGM_Settings.GetSetting(TGMSettingEnum.ShowFriendlies) == 1
+            && spawnOptions.IFF == GM.CurrentPlayerBody.GetPlayerIFF())
+        {
+            GameObject arrow = TGM_Manager.Instantiate(
+                TGM_ModLoader.tgmAssets.iffPrefab,
+                sosig.Links[0].R.transform.position + (Vector3.up * 0.75f),
+                sosig.Links[0].R.transform.rotation,
+                sosig.Links[0].R.transform);
+
+            arrow.transform.localRotation = Quaternion.Euler(0, 0, 180);
+        }
+
         return sosig;
+    }
+
+    public void ClearAllTeamSosigs()
+    {
+        for (int i = 0; i < sosigs.Count; i++)
+        {
+            sosigs[i].ClearSosig();
+        }
+        sosigs.Clear();
     }
 
     public static void DisableSosigWeaponPickup(Sosig s)
     {
-        //DO nothing if sosig weapons enabled
-        //if (profile.sosigWeapons)
-        //    return;
+        if (TGM_Settings.GetSetting(TGMSettingEnum.SosigWeapons) == 1)
+            return;
 
         foreach (var item in s.Inventory.Slots)
         {
@@ -168,4 +197,25 @@ public class TGM_Team
                 obj.IsPickUpLocked = true;
         }
     }
+
+    /*
+    public static void DestroySosigWeapons(Sosig s)
+    {
+        foreach (var item in s.Inventory.Slots)
+        {
+            if (item.HeldObject == null)
+                continue;
+            else
+                Object.Destroy(item.HeldObject.gameObject);
+        }
+
+        foreach (var item in s.Hands)
+        {
+            if (item.HeldObject == null)
+                continue;
+            else
+                Object.Destroy(item.HeldObject.gameObject);
+        }
+    }
+    */
 }

@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using FistVR;
 using TeamsGameMode.H3MP;
 
 namespace TeamsGameMode;
@@ -8,7 +9,7 @@ namespace TeamsGameMode;
 public class TGM_Manager : MonoBehaviour
 {
     public static TGM_Manager instance;
-    public static TGM_Profile profile;
+    //public static TGM_Profile profile;
     public static GameStateEnum gameState = GameStateEnum.GamemodeSelect;
     public static List<TGM_Gamemode> gamemodes = new List<TGM_Gamemode>();
 
@@ -90,6 +91,7 @@ public class TGM_Manager : MonoBehaviour
 
     void Start()
     {
+        //Maybe move this to SETUP, needs to be robust with custom gamemodes
         if (gamemodes == null)
             gamemodes = new List<TGM_Gamemode>();
 
@@ -115,6 +117,7 @@ public class TGM_Manager : MonoBehaviour
 
         TeamGameModePlugin.Logger.LogMessage($"Adding Gamemode: " + gamemode.name);
         gamemodes.Add(gamemode);
+        gamemode.index = gamemodes.Count - 1;
     }
 
     public void SetGameState(GameStateEnum state)
@@ -134,13 +137,13 @@ public class TGM_Manager : MonoBehaviour
             case GameStateEnum.Setup:       //Gamemode being configured
                 gamemode.Setup();
                 break;
-            case GameStateEnum.Pregame:       //30 sec Count down to game start
+            case GameStateEnum.Pregame:     //30 sec Count down to game start
                 gamemode.Pregame();
                 break;
             case GameStateEnum.Gameplay:    //Combat
                 gamemode.GameplayStart();
                 break;
-            case GameStateEnum.Postgame:      //30 Sec post gameplay
+            case GameStateEnum.Postgame:    //30 Sec post gameplay
                 gamemode.Postgame();
                 break;
             case GameStateEnum.Gameover:    //Final Scores, Wait for master or wait for all players to ready
@@ -152,6 +155,14 @@ public class TGM_Manager : MonoBehaviour
         //if(TGM_Networking.server)
     }
 
+    public IEnumerator SetGameStateDelayed(GameStateEnum state, float delay)
+    {
+        yield return new WaitForSeconds(delay);
+
+        //New State
+        instance.SetGameState(state);
+    }
+
     //------------------------------------------------------------------------------
     // Sosigs
     //------------------------------------------------------------------------------
@@ -159,6 +170,25 @@ public class TGM_Manager : MonoBehaviour
     protected virtual IEnumerator ClearSosig()
     {
         yield return null;
+    }
+
+    //------------------------------------------------------------------------------
+    // Player
+    //------------------------------------------------------------------------------
+
+    public static void LeaveTeam()
+    {
+        //Stop any respawning
+        instance.localPlayer.awaitingRespawn = false;
+
+        TGM_Scene.instance.playerResetPoint.SetPositionAndRotation(
+            TGM_Scene.instance.defaultResetPosition,
+            TGM_Scene.instance.defaultResetRotation);
+
+        GM.CurrentPlayerBody.SetPlayerIFF(-3);
+        Global.TeleportToPoint(Global.GetValidSpawnPoint(TGM_Scene.instance.playerResetPoint));
+        //Remove Class Menu
+        Destroy(TGM_ClassMenu.instance.gameObject);
     }
 
     //------------------------------------------------------------------------------

@@ -19,13 +19,17 @@ public class TGM_TeamSetup : MonoBehaviour
     private int browserTeamID = -1;
     private int browserMode = 0;
     private int browserTeam = 0;
-    private int browserIndex = 0;
+    private int browserSelectIndex = 0;
 
     [Header("Team UI")]
-    public Text scoreTextRed;
-    public Text scoreTextBlue;
-    public Text sosigsTextRed;
-    public Text sosigsTextBlue;
+    public Text[] scoreCountText;
+    public Text[] sosigsCountText;
+    public Image[] playerTeamThumbnails;
+    public Image[] sosigTeamThumbnails;
+    public Text[] playerTeamTitles;
+    public Text[] sosigTeamTitles;
+    public Text[] playerTeamDescriptions;
+    public Text[] sosigTeamDescriptions;
 
     void Awake()
     {
@@ -65,11 +69,26 @@ public class TGM_TeamSetup : MonoBehaviour
 
     void UpdateSettings()
     {
-        scoreTextRed.text = TGM_Manager.instance.team[0].scoreGoal.ToString();
-        scoreTextBlue.text = TGM_Manager.instance.team[1].scoreGoal.ToString();
+        for (int i = 0; i < TGM_Manager.instance.team.Length; i++)
+        {
+            scoreCountText[i].text = TGM_Manager.instance.team[i].scoreGoal.ToString();
+            sosigsCountText[i].text = TGM_Manager.instance.team[i].sosigLimit.ToString();
 
-        sosigsTextRed.text = TGM_Manager.instance.team[0].sosigLimit.ToString();
-        sosigsTextBlue.text = TGM_Manager.instance.team[1].sosigLimit.ToString();
+            //Check if mods are loaded in yet
+            if (TGM_ModLoader.playerTeams == null || TGM_ModLoader.playerTeams.Count == 0)
+                break;
+
+            int playerIndex = TGM_Manager.instance.team[i].playerTeam;
+            //Display new Profile Infomation
+            playerTeamTitles[i].text = TGM_ModLoader.playerTeams[playerIndex].name;
+            playerTeamDescriptions[i].text = TGM_ModLoader.playerTeams[playerIndex].description;
+            playerTeamThumbnails[i].sprite = TGM_ModLoader.playerTeams[playerIndex].thumbnail;
+
+            int sosigIndex = TGM_Manager.instance.team[i].sosigTeam;
+            sosigTeamTitles[i].text = TGM_ModLoader.sosigTeams[sosigIndex].name;
+            sosigTeamDescriptions[i].text = TGM_ModLoader.sosigTeams[sosigIndex].description;
+            sosigTeamThumbnails[i].sprite = TGM_ModLoader.sosigTeams[sosigIndex].thumbnail;
+        }
     }
 
 
@@ -112,6 +131,8 @@ public class TGM_TeamSetup : MonoBehaviour
 
     public void OpenBrowser(int type, int teamID)
     {
+        TGM_Manager.PlayAudio(TGM_Manager.PlayAudioEnum.Press);
+
         browserMode = type;
         browserTeamID = teamID;
 
@@ -166,10 +187,12 @@ public class TGM_TeamSetup : MonoBehaviour
 
     public void SelectBrowser(int i)
     {
-        browserIndex = i;
+        TGM_Manager.PlayAudio(TGM_Manager.PlayAudioEnum.Press);
+
+        browserSelectIndex = i;
         if (browserMode == 0)
         {
-            TGM_PlayerTeam team = TGM_ModLoader.playerTeams[browserIndex];
+            TGM_PlayerTeam team = TGM_ModLoader.playerTeams[browserSelectIndex];
 
             browserTitle.text = team.name;
             browserDescription.text = team.description;
@@ -177,7 +200,7 @@ public class TGM_TeamSetup : MonoBehaviour
         }
         else
         {
-            TGM_SosigTeam team = TGM_ModLoader.sosigTeams[browserIndex];
+            TGM_SosigTeam team = TGM_ModLoader.sosigTeams[browserSelectIndex];
 
             browserTitle.text = team.name;
             browserDescription.text = team.description;
@@ -187,13 +210,15 @@ public class TGM_TeamSetup : MonoBehaviour
 
     public void ConfirmBrowser()
     {
+        TGM_Manager.PlayAudio(TGM_Manager.PlayAudioEnum.Confirm);
+
         if (browserMode == 0)
         {
-            TGM_Manager.instance.team[browserTeamID].playerTeam = browserIndex;
+            TGM_Manager.instance.team[browserTeamID].playerTeam = browserSelectIndex;
         }
         else
         {
-            TGM_Manager.instance.team[browserTeamID].sosigTeam = browserIndex;
+            TGM_Manager.instance.team[browserTeamID].sosigTeam = browserSelectIndex;
         }
 
         //Clear old Buttons

@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.UI;
 using FistVR;
 
@@ -17,25 +13,37 @@ public class TGM_Button : MonoBehaviour
 
     public void SelectClass(int index)
     {
+        TGM_Manager.PlayAudio(TGM_Manager.PlayAudioEnum.Rearm);
         TGM_ClassMenu.instance.SpawnClass(index);
-    }
-
-    public void LaunchGame()
-    {
-
     }
 
     public void AdjustSettingValue(int amount)
     {
-        TGM_MainMenu.Setting setting = TGM_MainMenu.instance.gameSettings[index];
+        TGM_Settings.Setting setting = TGM_Settings.gameSettings[index];
+
+        amount *= setting.intIncrement;
 
         //Loop Around
-        if (value + amount > setting.intMax)
-            value = setting.intMin;
-        else if (value + amount < setting.intMin)
-            value = setting.intMax;
-        else
+        if (setting.intMax == 0 && setting.intMin == 0)
+        {
             value += amount;
+        }
+        else
+        {
+            if (value + amount > setting.intMax)
+                value = setting.intMin;
+            else if (value + amount < setting.intMin)
+                value = setting.intMax;
+            else
+                value += amount;
+        }
+
+        TGM_Manager.PlayAudio(TGM_Manager.PlayAudioEnum.Press);
+
+        //Assign Game Setting
+        TGM_Settings.SetSetting((TGMSettingEnum)index, value);
+        //TGM_Settings.gameSettings[index].value = value;
+
         TGM_MainMenu.instance.UpdateSettings();
     }
 
@@ -71,12 +79,13 @@ public class TGM_Button : MonoBehaviour
         Transform spawn = TGM_Scene.GetTeamSpawnRoomTransform(iff);
 
         //Teleport to team spawn room
-        GM.CurrentMovementManager.TeleportToPoint(Global.GetValidSpawnPoint(spawn),
-            true,
-            spawn.rotation.eulerAngles);
-
-
+        Global.TeleportToPoint(Global.GetValidSpawnPoint(spawn));
         Instantiate(TGM_ModLoader.tgmAssets.classMenu, spawn.position + (Vector3.up * 1.25f), spawn.rotation);
+
+        //Set Spawn point to new Spawn Room
+        GM.CurrentSceneSettings.DeathResetPoint = TGM_Scene.instance.playerResetPoint;
+        TGM_Scene.instance.playerResetPoint.SetPositionAndRotation(spawn.position, spawn.rotation);
+        TGM_Manager.instance.gamemode.OnJoinTeam(iff);
     }
 
     void OnValidate()

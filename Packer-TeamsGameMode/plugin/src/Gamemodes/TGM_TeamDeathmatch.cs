@@ -10,8 +10,6 @@ namespace TeamsGameMode;
 public class TGM_TeamDeathmatch : TGM_Gamemode
 {
 
-    public int winIFF = -1;
-
     public TGM_TeamDeathmatch(string modeName = "", string modeDescription = "", Sprite modeThumbnail = null)
     {
         name = modeName;
@@ -19,12 +17,11 @@ public class TGM_TeamDeathmatch : TGM_Gamemode
         thumbnail = modeThumbnail;
     }
 
-    public override TGM_Profile LoadDefaultProfile()
+    public override void LoadDefaultProfile()
     {
-        TGM_Profile profile = base.LoadDefaultProfile();
-        //Do custom default settings here
+        base.LoadDefaultProfile();
+        //Do Gamemode Settings here
 
-        return profile;
     }
 
     public override void Setup()
@@ -35,6 +32,11 @@ public class TGM_TeamDeathmatch : TGM_Gamemode
         {
             TGM_Manager.instance.team[i].scoreGoal = 20;
         }
+    }
+
+    public override void Pregame()
+    {
+        base.Pregame();
     }
 
     public override void Postgame()
@@ -66,10 +68,13 @@ public class TGM_TeamDeathmatch : TGM_Gamemode
     public override void Update()
     {
         base.Update();
-        RespawnTime();
 
         if (Networking.IsClient())
             return;
+
+        //Only Respawn during gameplay
+        if(TGM_Manager.gameState == TGM_Manager.GameStateEnum.Gameplay)
+            RespawnTime();
 
         //Check for Win Condition
         for (int i = 0; i < TGM_Manager.instance.team.Length; i++)
@@ -85,10 +90,51 @@ public class TGM_TeamDeathmatch : TGM_Gamemode
         }    
     }
 
-    public override void OnPlayerKilled(int playerIndex, int killerIFF)
+    public override void OnPlayerKilled(bool killedSelf, int iff)
     {
-        base.OnPlayerKilled(playerIndex, killerIFF);
+        base.OnPlayerKilled(killedSelf, iff);
+
+        if (TGM_Manager.gameState != TGM_Manager.GameStateEnum.Gameplay)
+            return;
+
+        AdjustTeamScore(Global.GetEnemyIFF(GM.CurrentPlayerBody.GetPlayerIFF()), 1);
+
+        //Player Stats
         TGM_Manager.instance.localPlayer.deaths++;
+        TGM_Manager.instance.localPlayer.score += killedSelf ? -1 : 1;  //Minus score if killed self
+    }
+
+    public override void OnJoinTeam(int iff)
+    {
+        base.OnJoinTeam(iff);
+
+        int enemyIFF = TGM_Sosigs.GetEnemyIFF(GM.CurrentPlayerBody.GetPlayerIFF());
+
+        Transform markerPoint =
+            (TGM_Manager.instance.team[enemyIFF].currentSpawnArea.capturePoint != null) ?
+            TGM_Manager.instance.team[enemyIFF].currentSpawnArea.capturePoint :
+            TGM_Manager.instance.team[enemyIFF].currentSpawnArea.objective;
+
+        //Give player some direction to the combat area
+        if (markerPoint != null)
+        {
+            TGM_Compass.instance.CreateMarker(
+                TGM_Compass.instance.markerSprites[(int)TGM_Compass.MarkerEnum.Attack],
+                Color.red,
+                markerPoint);
+        }
+    }
+
+    public override void AdjustTeamScore(int teamID, int amount)
+    {
+        if (TGM_Manager.gameState != TGM_Manager.GameStateEnum.Gameplay)
+            return;
+
+        base.AdjustTeamScore(teamID, amount);
+
+        //Increase player score
+        if(teamID == GM.CurrentPlayerBody.GetPlayerIFF())
+            TGM_Manager.instance.localPlayer.score += amount;
     }
 
     public override void OnSosigCreate(Sosig s)
@@ -106,11 +152,9 @@ public class TGM_TeamDeathmatch : TGM_Gamemode
     public override void OnSosigKilled(Sosig s)
     {
         base.OnSosigKilled(s);
-        if(s.GetDiedFromIFF() == 0 || s.GetDiedFromIFF() == 1)
-            TGM_Manager.instance.team[s.GetDiedFromIFF()].currentKills++;
-        int iff = s.GetIFF();
-        AdjustTeamScore(iff, 1);
-        TGM_Manager.instance.localPlayer.kills++;
+
+        //Score
+        AdjustTeamScore(s.GetIFF(), 1);
 
         //Remove from sosig team count
         for (int i = 0; i < TGM_Manager.instance.team.Length; i++)

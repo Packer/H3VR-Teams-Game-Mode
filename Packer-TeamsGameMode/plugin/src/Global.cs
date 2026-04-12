@@ -30,21 +30,48 @@ namespace TeamsGameMode
             return spawnedMain;
         }
 
-        public static Vector3 GetValidSpawnPoint(Transform transform)
+        public static Vector3[] GetValidSpawnPoint(Transform transform)
         {
+            Vector3[] spawnData = new Vector3[2];
             Vector3 position = transform.position;
-            Vector3 scale = transform.localScale;
+            Vector3 scale = transform.localScale / 2;
             Vector3 randomPosition
                 = new Vector3(
-                    Random.Range(-scale.x * 0.5f, scale.x * 0.5f),
-                    Random.Range(-scale.y * 0.5f, scale.y * 0.5f),
-                    Random.Range(-scale.z * 0.5f, scale.z * 0.5f));
+                    Random.Range(-scale.x, scale.x),
+                    Random.Range(-scale.y, scale.y),
+                    Random.Range(-scale.z, scale.z));
 
             //Assign Position
-            if (NavMesh.SamplePosition(position + randomPosition, out NavMeshHit hit, scale.y, NavMesh.AllAreas))
+            if (NavMesh.SamplePosition(position + randomPosition, out NavMeshHit hit, transform.localScale.y, NavMesh.AllAreas))
                 position = hit.position;
 
-            return position;
+            spawnData[0] = position;
+            spawnData[1] = transform.rotation.eulerAngles;
+
+            return spawnData;
+        }
+
+        public static Vector3[] GetRandomPlayerSpawnPoint(Transform[] spawnPoints)
+        {
+            Transform spawn = spawnPoints[Random.Range(0, spawnPoints.Length)];
+            return GetValidSpawnPoint(spawn);
+        }
+
+        public static void TeleportToPoint(Vector3[] pointData)
+        {
+            GM.CurrentMovementManager.TeleportToPoint(pointData[0],
+                true,
+                pointData[1]);
+        }
+
+        /// <summary>
+        /// Returns the opposite team's iff to the input iff
+        /// </summary>
+        /// <param name="iff"></param>
+        /// <returns></returns>
+        public static int GetEnemyIFF(int iff)
+        {
+            return iff == 1 ? 0 : 1;
         }
 
         public static AmmoLoadType GetLoadType(FVRObject fvrObject)

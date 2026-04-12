@@ -37,6 +37,9 @@ public class TGM_ClassMenu : MonoBehaviour
 
     void Awake()
     {
+        if (instance != null)
+            Destroy(instance.gameObject);
+
         instance = this;
     }
 
@@ -89,6 +92,12 @@ public class TGM_ClassMenu : MonoBehaviour
         }
     }
 
+    public void LeaveTeam()
+    {
+        TGM_Manager.PlayAudio(TGM_Manager.PlayAudioEnum.Confirm);
+        TGM_Manager.LeaveTeam();
+    }
+
     public void SpawnClass(int id)
     {
         if (id < 0)
@@ -99,20 +108,17 @@ public class TGM_ClassMenu : MonoBehaviour
 
         int team = TGM_Manager.instance.localPlayer.iff;
 
+        
         //Spawn Locking Per class?
-        if (TGM_Manager.profile.gameSettings[(int)SettingEnum.SpawnLock] == 2)
-        {
+        if (TGM_Settings.GetSetting(TGMSettingEnum.SpawnLock) == 2)
             GM.CurrentSceneSettings.IsSpawnLockingEnabled = TGM_Manager.instance.team[team].GetPlayerTeam().playerClasses[id].canSpawnLock;
-        }
         else
-        {
-            GM.CurrentSceneSettings.IsSpawnLockingEnabled = TGM_Manager.profile.gameSettings[(int)SettingEnum.SpawnLock] >= 1 ? true : false;
-        }
+            GM.CurrentSceneSettings.IsSpawnLockingEnabled = TGM_Settings.GetSetting(TGMSettingEnum.SpawnLock) == 1 ? true : false;
 
         //Set Player Health
-        int healthSetting = TGM_Manager.profile.gameSettings[(int)SettingEnum.PlayerHealth];
-        //If -1 use player class health otherwise use global setting
-        if (healthSetting == -1)
+        int healthSetting = TGM_Settings.GetSetting(TGMSettingEnum.PlayerHealth);
+        //If 0 use player class health otherwise use global setting
+        if (healthSetting == 0)
             healthSetting = TGM_Manager.instance.team[team].GetPlayerTeam().playerClasses[id].playerHealth;
         GM.CurrentPlayerBody.SetHealthThreshold(healthSetting);
         GM.CurrentPlayerBody.Health = healthSetting;
@@ -124,12 +130,6 @@ public class TGM_ClassMenu : MonoBehaviour
         TGM_PlayerClass.SubClass subClass 
             = TGM_Manager.instance.team[team].GetPlayerTeam().playerClasses[id].subClasses[
                 Random.Range(0, TGM_Manager.instance.team[team].GetPlayerTeam().playerClasses[id].subClasses.Length)];
-
-        //Spawn Locking
-        if (TGM_Manager.profile.gameSettings[(int)SettingEnum.SpawnLock] == 2)
-            GM.CurrentSceneSettings.IsSpawnLockingEnabled = TGM_Manager.instance.team[team].GetPlayerTeam().playerClasses[id].canSpawnLock;
-        else
-            GM.CurrentSceneSettings.IsSpawnLockingEnabled = TGM_Manager.profile.gameSettings[(int)SettingEnum.SpawnLock] == 0 ? false : true;
 
         //Spawn our sub classes items
         for (int x = 0; x < subClass.items.Length; x++)
@@ -147,7 +147,7 @@ public class TGM_ClassMenu : MonoBehaviour
             spawnMainIndex = 0;
             spawnMainOffset += 0.5f;
         }
-        return spawnPoint;;
+        return spawnPoint;
     }
 
     public static void SpawnItemSet(TGM_PlayerClass.ItemSet itemSet)
@@ -191,10 +191,12 @@ public class TGM_ClassMenu : MonoBehaviour
                 {
                     if (spawnFVRObject.RequiredSecondaryPieces[s] != null)
                     {
-                        Object.Instantiate(
-                            spawnFVRObject.RequiredSecondaryPieces[s].GetGameObject(),
+                        FVRPhysicalObject attach = Global.SpawnFVRObject(
+                            spawnFVRObject.RequiredSecondaryPieces[s],
                             instance.ammoSpawns[4].position,
-                            instance.ammoSpawns[4].rotation);
+                            instance.ammoSpawns[4].rotation.eulerAngles);
+
+                        TGM_Manager.instance.localPlayer.playersItems.Add(attach);
                     }
                 }
             }
@@ -261,6 +263,7 @@ public class TGM_ClassMenu : MonoBehaviour
                         instance.ammoSpawns[spawnMainIndex].position + (Vector3.up * spawnMainOffset),
                         instance.ammoSpawns[spawnMainIndex].rotation.eulerAngles);
 
+                    TGM_Manager.instance.localPlayer.playersItems.Add(newAmmo);
 
                     //IF a Ammo Container, fill with ammo type
                     switch (Global.GetLoadType(spawnFVRAmmo))

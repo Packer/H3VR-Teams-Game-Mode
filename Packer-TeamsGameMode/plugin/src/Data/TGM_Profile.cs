@@ -3,28 +3,44 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace TeamsGameMode
+namespace TeamsGameMode;
+
+public class TGM_Profile
 {
-    public class TGM_Profile
-    {
-        public string name = "New Profile";
-        public List<string> playerTeams;
-        public List<string> sosigTeams;
+    [NonSerialized]
+    public static TGM_Profile profile = new TGM_Profile();
 
-        public int gamemode = 0;
-        public int[] gameSettings;
-        public int[] gamemodeSettings;
+    public string name = "New Profile";
+    public List<string> playerTeams;
+    public List<string> sosigTeams;
+
+    public int gamemode = 0;
+    public List<int> gameSettings;
+    public List<int> gamemodeSettings;
+
+    /*
+    public static void UpdateSettings()
+    {
+        TGM_Profile newProfile = new TGM_Profile();
+        newProfile.name = profile.name;
+        newProfile.playerTeams = profile.playerTeams;
+        newProfile.sosigTeams = profile.sosigTeams;
+
+        for (int i = 0; i < TGM_Settings.gameSettings.Count; i++)
+        {
+
+        }
     }
 
-    public enum SettingEnum
+
+    public static int GetSetting(TGMSettingEnum setting)
     {
-        SpawnLock = 0,
-        SpawnWaveTime = 1,
-        TimeLimit = 2,
-        CanRespawn = 3,
-        ShowFriendlies = 4,
-        ItemsOnDeath = 5,
-        SosigWeapons = 6,
-        PlayerHealth = 7,
+        return profile.gameSettings[(int)setting];
     }
+
+    public static void SetSetting(TGMSettingEnum setting, int value)
+    {
+        profile.gameSettings[(int)setting] = value;
+    }
+    */
 }

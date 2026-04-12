@@ -24,34 +24,11 @@ public class TGM_MainMenu : MonoBehaviour
         Spectator = 4,
     }
 
-    [System.Serializable]
-    public class Setting
-    {
-        public string description;
-        //public SettingEnum setting; //For Internal use only, doesn't do anything
-        public string[] settings;
-        public SettingType type = SettingType.Strings;
-        public int value = 0;
-        public int intMin = 0;
-        public int intMax = 64;
-        [Tooltip("If true, does not sync over H3MP")]
-        public bool localOnly = false;
-        [HideInInspector]
-        public bool active = true;  //Disabled via code if not valid
-        [HideInInspector]
-        public TGM_Button button;
-
-        public enum SettingType
-        {
-            Strings = 0,
-            Int = 1,
-        }
-    }
 
     [Header("Page: Game Settings")]
-    public List<Setting> gameSettings = new List<Setting>();
+    //public List<TGM_Settings.Setting> TGM_Settings.gameSettings = new List<TGM_Settings.Setting>();      //DELETE ME
+    //public List<TGM_Settings.Setting> gamemodeSettings = new List<TGM_Settings.Setting>();  //TODO DELETE ME
     public GameObject gameSettingPrefab;
-    public List<Setting> gamemodeSettings = new List<Setting>();
     public GameObject gamemodeSettingPrefab;
     public GameObject requestButton;
 
@@ -114,7 +91,7 @@ public class TGM_MainMenu : MonoBehaviour
 
             TGM_Button btn = Instantiate(gamemodeBtnPrefab, gamemodeBtnPrefab.transform.parent).GetComponent<TGM_Button>();
             btn.gameObject.SetActive(true);
-            btn.texts[0].text = gm.name;
+            //btn.texts[0].text = gm.name; //Just use Images for gamemodes
             if(gm.thumbnail != null)
                 btn.buttons[0].image.sprite = gm.thumbnail;
             btn.index = i;
@@ -124,9 +101,27 @@ public class TGM_MainMenu : MonoBehaviour
     public void SelectGamemode(int index)
     {
         TeamGameModePlugin.Logger.LogMessage($"Gamemode Selected: " + TGM_Manager.gamemodes[index].name);
-        TGM_Manager.instance.gamemode = TGM_Manager.gamemodes[index];
+
+        //If not already assigned, assign the gamemode
+        if (TGM_Manager.instance.gamemode != TGM_Manager.gamemodes[index])
+        {
+            TGM_Manager.instance.gamemode = TGM_Manager.gamemodes[index];
+            TGM_Manager.instance.gamemode.LoadDefaultProfile();
+        }
+
+        //Reset Team stats for 2nd playthrough
+        for (int i = 0; i < TGM_Manager.instance.team.Length; i++)
+        {
+            TGM_Manager.instance.team[i].ResetTeamTracking();
+        }
+
+        //Reset player Tracking
+        TGM_Manager.instance.localPlayer.ResetPlayer();
+
         GM.CurrentSceneSettings.SosigKillEvent += TGM_Manager.instance.gamemode.OnSosigKilled;
-        TGM_Manager.profile = TGM_Manager.instance.gamemode.LoadDefaultProfile();
+        GM.CurrentSceneSettings.PlayerDeathFromIFFEvent += TGM_Manager.instance.gamemode.OnPlayerKilled;
+
+
         OpenPage(Page.GameSettings);
         UpdateSettings();
         TGM_Manager.instance.SetGameState(TGM_Manager.GameStateEnum.Setup);
@@ -134,7 +129,6 @@ public class TGM_MainMenu : MonoBehaviour
 
     void OnDisable()
     {
-        GM.CurrentSceneSettings.SosigKillEvent -= TGM_Manager.instance.gamemode.OnSosigKilled;
         //GM.CurrentSceneSettings.PlayerDeathFromIFFEvent -= TGM_Manager.instance.gamemode.OnPlayerKilled;
     }
 
@@ -144,14 +138,14 @@ public class TGM_MainMenu : MonoBehaviour
 
     void SetupSettings()
     {
-        for (int i = 0; i < gameSettings.Count; i++)
+        for (int i = 0; i < TGM_Settings.gameSettings.Count; i++)
         {
             TGM_Button btn = Instantiate(gameSettingPrefab, gameSettingPrefab.transform.parent).GetComponent<TGM_Button>();
             btn.gameObject.SetActive(true);
             btn.index = i;
 
             //Assign button to Setting
-            gameSettings[i].button = btn;
+            TGM_Settings.gameSettings[i].button = btn;
         }
 
         UpdateSettings();
@@ -159,20 +153,28 @@ public class TGM_MainMenu : MonoBehaviour
 
     public void UpdateSettings()
     {
-        for (int i = 0; i < gameSettings.Count; i++)
+        for (int i = 0; i < TGM_Settings.gameSettings.Count; i++)
         {
-            TGM_Button btn = gameSettings[i].button;
-            btn.value = gameSettings[i].value;
-            btn.texts[0].text = gameSettings[i].description;
+            TGM_Button btn = TGM_Settings.gameSettings[i].button;
+            btn.value = TGM_Settings.gameSettings[i].value;
+            btn.texts[0].text = TGM_Settings.gameSettings[i].description;
 
             //Current Setting
-            if (gameSettings[i].type == Setting.SettingType.Strings)
-                btn.texts[1].text = gameSettings[i].settings[gameSettings[i].value]; //Text
+            if (TGM_Settings.gameSettings[i].type == TGM_Settings.Setting.SettingType.Strings)
+                btn.texts[1].text = TGM_Settings.gameSettings[i].settings[TGM_Settings.gameSettings[i].value]; //Text
+            else if (TGM_Settings.gameSettings[i].type == TGM_Settings.Setting.SettingType.FirstString)
+            {
+                //Set to first String name (Default) else use raw numbers
+                if(TGM_Settings.gameSettings[i].value == 0)
+                    btn.texts[1].text = TGM_Settings.gameSettings[i].settings[TGM_Settings.gameSettings[i].value]; //Text
+                else
+                    btn.texts[1].text = TGM_Settings.gameSettings[i].value.ToString(); //Number
+            }
             else
-                btn.texts[1].text = gameSettings[i].value.ToString(); //Number
+                btn.texts[1].text = TGM_Settings.gameSettings[i].value.ToString(); //Number
 
 
-            if (Networking.IsClient() && !gameSettings[i].localOnly)
+            if (Networking.IsClient() && !TGM_Settings.gameSettings[i].localOnly)
             {
                 btn.buttons[0].gameObject.SetActive(false);
                 btn.buttons[1].gameObject.SetActive(false);
@@ -210,7 +212,7 @@ public class TGM_MainMenu : MonoBehaviour
 
     public void StartGame()
     {
-        TGM_Manager.instance.SetGameState(TGM_Manager.GameStateEnum.Gameplay);
+        TGM_Manager.instance.SetGameState(TGM_Manager.GameStateEnum.Pregame);
         OpenPage(Page.JoinTeam);
         TeamGameModePlugin.Logger.LogMessage($"Game Started");
     }

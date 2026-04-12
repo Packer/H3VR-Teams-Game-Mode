@@ -1,13 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System.Collections.Generic;
 using UnityEngine;
 using FistVR;
 
 namespace TeamsGameMode;
 
-[Serializable]
+[System.Serializable]
 public class TGM_Player
 {
     [Header("Sosig")]
@@ -22,17 +19,25 @@ public class TGM_Player
     public int iff = 0; //Default team
     public int kills = 0;
     public int deaths = 0;
-    public int killStreak = 0;  //Kills in a row before dying
+    public int score = 0;   //Player score
 
     [Header("Data")]
     public List<FVRPhysicalObject> playersItems = new List<FVRPhysicalObject>();
+
+    public void ResetPlayer()
+    {
+        kills = 0;
+        deaths = 0;
+        score = 0;
+        awaitingRespawn = false;
+    }
 
     public void DestroyPlayersItems()
     {
         for (int i = 0; i < playersItems.Count; i++)
         {
             if (playersItems[i] != null)
-                UnityEngine.MonoBehaviour.Destroy(playersItems[i].gameObject);
+                Object.Destroy(playersItems[i].gameObject);
         }
         playersItems.Clear();
 

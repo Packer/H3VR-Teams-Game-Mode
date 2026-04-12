@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using UnityEngine;
+using UnityEngine.AI;
 using Random = UnityEngine.Random;
 
 namespace TeamsGameMode
@@ -130,25 +131,6 @@ namespace TeamsGameMode
 
             return locations;
         }
-
-        public Vector3[] GetRandomPlayerSpawnPoint()
-        {
-            Transform spawn = spawnPoints[Random.Range(0, spawnPoints.Length)];
-            Vector3 areaScale = spawn.localScale / 2;
-
-            Vector3[] spawnData = new Vector3[2];
-
-            spawnData[0] = spawn.position + new Vector3(
-                Random.Range(-areaScale.x, areaScale.x),
-                Random.Range(-areaScale.y, areaScale.y),
-                Random.Range(-areaScale.z, areaScale.z));
-
-            spawnData[1] = spawn.rotation.eulerAngles;
-
-
-            return spawnData;
-        }
-
 
         public static Vector3[] attackIcon = {Vector3.up, (Vector3.up * 0.5f) + (Vector3.left * 0.5f), (Vector3.up * 0.5f) + (Vector3.right * 0.5f) };
 

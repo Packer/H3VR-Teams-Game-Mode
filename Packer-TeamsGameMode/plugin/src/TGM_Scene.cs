@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using FistVR;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -13,7 +14,11 @@ namespace TeamsGameMode
         public TeamSpawnRoom[] teams = new TeamSpawnRoom[2];
         public TGM_Area[] areas = new TGM_Area[2];
         public ObstacleAvoidanceType avoidanceQuailty = ObstacleAvoidanceType.LowQualityObstacleAvoidance;
-        public Transform playerSpawnPoint;
+        public Transform playerResetPoint;
+        [HideInInspector]
+        public Vector3 defaultResetPosition;
+        [HideInInspector]
+        public Quaternion defaultResetRotation;
 
         [Header("Menus")]
         public Transform mainMenu;
@@ -77,6 +82,8 @@ namespace TeamsGameMode
         void Awake()
         {
             instance = this;
+            defaultResetPosition = playerResetPoint.position;
+            defaultResetRotation = playerResetPoint.rotation;
         }
 
         void Start()

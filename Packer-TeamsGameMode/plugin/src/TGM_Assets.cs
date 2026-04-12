@@ -17,5 +17,7 @@ namespace TeamsGameMode
         public TGM_Spectator spectator;
 
         public TGM_Compass compass;
+
+        public GameObject iffPrefab;
     }
 }
