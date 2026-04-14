@@ -24,6 +24,7 @@ namespace TeamsGameMode
         public Transform mainMenu;
         public Transform teamSetupMenu;
         public Transform profilesMenu;
+        public Transform itemSpawner;
 
         [Header("Audio Overwrite")]
         [Tooltip("Start Game, or spawn items etc")]
@@ -106,6 +107,7 @@ namespace TeamsGameMode
 
             Instantiate(TGM_ModLoader.tgmAssets.spectator);
             Instantiate(TGM_ModLoader.tgmAssets.compass);
+            Instantiate(TGM_ModLoader.tgmAssets.endScreen);
             yield return new WaitForEndOfFrame();
 
             //Everything has loaded in, invoke the event to get any extras in before we set everything up
@@ -172,6 +174,19 @@ namespace TeamsGameMode
                 Gizmos.matrix = Matrix4x4.TRS(profilesMenu.position, profilesMenu.rotation, new Vector3(0.96f, 1.08f, 0.01f));
                 Gizmos.DrawCube(Vector3.zero, Vector3.one);
                 Gizmos.DrawWireCube(Vector3.zero, Vector3.one);
+            }
+
+            //Matrix Manipulated Below        
+            if (itemSpawner != null)
+            {
+                Gizmos.color = new Color(0.4f, 0.4f, 0.9f, 0.5f);
+                Gizmos.matrix = itemSpawner.localToWorldMatrix;
+                //Item Spawner
+                Vector3 vector = new Vector3(0f, 0.7f, 0.25f);
+                Vector3 size = new Vector3(2.3f, 1.2f, 0.5f);
+                Vector3 vector2 = Vector3.forward;
+                Gizmos.DrawCube(vector, size);
+                Gizmos.DrawLine(vector, vector + vector2 * 0.5f);
             }
         }
 

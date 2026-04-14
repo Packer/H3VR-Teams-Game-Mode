@@ -22,8 +22,7 @@ public class TGM_Manager : MonoBehaviour
 
     [Header("DATA")]
     public TGM_Player localPlayer = new TGM_Player();
-    public TGM_Player[] players;
-    public TGM_Player[] sosigs;
+    public float startTime = 0;
 
     [Header("Audio")]
     public AudioSource globalAudio;
@@ -66,7 +65,6 @@ public class TGM_Manager : MonoBehaviour
             team[i].playerTeam = 0;
             team[i].sosigTeam = 0;
             team[i].iff = i;
-
         }
 
         //Unique Setup
@@ -104,7 +102,9 @@ public class TGM_Manager : MonoBehaviour
     void Update()
     {
         if (gameState == GameStateEnum.Gameplay)
+        {
             gamemode.Update();
+        }
     }
 
     public void AddGamemode(TGM_Gamemode gamemode)
@@ -132,12 +132,13 @@ public class TGM_Manager : MonoBehaviour
         switch (state)
         {
             case GameStateEnum.GamemodeSelect:
-                //TODO reset entire gamemode back (Or Reload level?)
                 break;
             case GameStateEnum.Setup:       //Gamemode being configured
                 gamemode.Setup();
+                startTime = 0;               //Reset Playtime to zero;
                 break;
             case GameStateEnum.Pregame:     //30 sec Count down to game start
+                startTime = Time.time + TGM_Gamemode.gameStartDelay;
                 gamemode.Pregame();
                 break;
             case GameStateEnum.Gameplay:    //Combat
@@ -167,9 +168,22 @@ public class TGM_Manager : MonoBehaviour
     // Sosigs
     //------------------------------------------------------------------------------
 
-    protected virtual IEnumerator ClearSosig()
+    public void OnSosigKilled(Sosig s)
     {
-        yield return null;
+        TGM_Team sosigTeam = team[s.GetIFF()];
+
+        //Assign to Empty Slot
+        for (int i = 0; i < sosigTeam.sosigsData.Count; i++)
+        {
+            if (sosigTeam.sosigsData[i].sosig == s)
+            {
+                if(s.GetIFF() != s.GetDiedFromIFF())
+                    Debug.Log(sosigTeam.sosigsData[i].playerName + " was killed by an enemy");
+                else
+                    Debug.Log(sosigTeam.sosigsData[i].playerName + " was killed by a teammate");
+                break;
+            }
+        }
     }
 
     //------------------------------------------------------------------------------
@@ -187,8 +201,71 @@ public class TGM_Manager : MonoBehaviour
 
         GM.CurrentPlayerBody.SetPlayerIFF(-3);
         Global.TeleportToPoint(Global.GetValidSpawnPoint(TGM_Scene.instance.playerResetPoint));
+
         //Remove Class Menu
-        Destroy(TGM_ClassMenu.instance.gameObject);
+        if(TGM_ClassMenu.instance != null)
+            Destroy(TGM_ClassMenu.instance.gameObject);
+    }
+
+    public void PlayerDeathEvent(bool killedSelf, int iff)
+    {
+        if (TGM_Settings.GetSetting(TGMSettingEnum.PlayerItemsOnDeath) > 0)
+        {
+            //Hand Items
+            FVRPhysicalObject[] hands = GM.CurrentPlayerBody.transform.GetComponentsInChildren<FVRPhysicalObject>();
+
+            if (hands != null)
+            {
+                for (int i = 0; i < hands.Length; i++)
+                {
+                    if (hands[i] != null)
+                    {
+                        if (hands[i].ObjectWrapper)
+                            continue;
+
+                        hands[i].ForceBreakInteraction();
+                        hands[i].ClearQuickbeltState();
+                    }
+                }
+            }
+
+            if (GM.CurrentPlayerBody != null && GM.CurrentPlayerBody.QBSlots_Internal != null)
+            {
+                //All Quick belt slots into backpacks
+                for (int i = 0; i < GM.CurrentPlayerBody.QBSlots_Internal.Count; i++)
+                {
+                    if (GM.CurrentPlayerBody.QBSlots_Internal[i] == null)
+                        continue;
+
+                    //Debug.Log("QB: " + i);
+                    FVRPhysicalObject phy = GM.CurrentPlayerBody.QBSlots_Internal[i].CurObject;
+
+                    if (phy == null || phy.ObjectWrapper != null)
+                        continue;
+
+                    phy.ClearQuickbeltState();
+
+                    if (phy.Slots != null && phy.Slots.Length > 0)
+                    {
+                        for (int x = 0; x < phy.Slots.Length; x++)
+                        {
+                            if (phy.Slots[x] != null && phy.Slots[x].CurObject != null)
+                            {
+                                phy.Slots[x].CurObject.ClearQuickbeltState();
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        /*
+        //If respawning not enabled
+        if (TGM_Settings.GetSetting(TGMSettingEnum.CanRespawn) == 0)
+        {
+
+        }
+        */
     }
 
     //------------------------------------------------------------------------------

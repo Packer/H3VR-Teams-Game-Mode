@@ -21,6 +21,7 @@ public class TGM_Team
     public int sosigLimit = 8;      //Total amount of sosigs on this team
     public int scoreGoal = 20;
     public List<Sosig> sosigs = new List<Sosig>();
+    public List<TGM_Player> sosigsData = new List<TGM_Player>();
     public Color color;
 
     //Tracking
@@ -66,6 +67,7 @@ public class TGM_Team
             Vector3[] data = Global.GetRandomPlayerSpawnPoint(currentSpawnArea.spawnPoints);
             GM.CurrentMovementManager.TeleportToPoint(data[0], true, data[1]);
             TGM_Manager.instance.localPlayer.awaitingRespawn = false;
+            TGM_ClassMenu.instance.spawnButtonText.text = "Spawn";
         }
 
         //Spawn Sosigs
@@ -137,6 +139,17 @@ public class TGM_Team
                 position,
                 rotation);
 
+        //Assign to Empty Slot
+        for (int i = 0; i < sosigsData.Count; i++)
+        {
+            if (sosigsData[i].sosig == null)
+            {
+                sosigsData[i].sosig = sosig;
+                //TODO Display name here
+                break;
+            }
+        }
+
         DisableSosigWeaponPickup(sosig);
 
         //Set Agents to quailty level
@@ -167,9 +180,18 @@ public class TGM_Team
     {
         for (int i = 0; i < sosigs.Count; i++)
         {
-            sosigs[i].ClearSosig();
+            if(sosigs[i] != null)
+                sosigs[i].ClearSosig();
         }
         sosigs.Clear();
+
+        for (int i = 0; i < sosigsData.Count; i++)
+        {
+            if (sosigsData[i].sosig != null)
+                sosigsData[i].sosig.ClearSosig();
+        }
+
+        sosigsData.Clear();
     }
 
     public static void DisableSosigWeaponPickup(Sosig s)

@@ -90,7 +90,7 @@ public class TGM_Button : MonoBehaviour
 
     void OnValidate()
     {
-        return;
+        /*
 
         BoxCollider box = gameObject.GetComponent<BoxCollider>();
 
@@ -103,5 +103,6 @@ public class TGM_Button : MonoBehaviour
             return;
 
         box.size = new Vector3(rect.sizeDelta.x, rect.sizeDelta.y, 1);
+        */
     }
 }

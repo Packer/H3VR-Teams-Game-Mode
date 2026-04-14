@@ -9,16 +9,15 @@ public class TGM_TeamSetup : MonoBehaviour
     public static TGM_TeamSetup instance;
 
     [Header("Browser")]
-    [SerializeField] GameObject browserPanel;
-    [SerializeField] GameObject browserButtonPrefab;
-    [SerializeField] Transform browserContent;
-    [SerializeField] Text browserTitle;
-    [SerializeField] Text browserDescription;
-    [SerializeField] Image browserThumbnail;
+    public GameObject browserPanel;
+    public GameObject browserButtonPrefab;
+    public Transform browserContent;
+    public Text browserTitle;
+    public Text browserDescription;
+    public Image browserThumbnail;
     private List<TGM_Button> browserButtons = new List<TGM_Button>();
     private int browserTeamID = -1;
     private int browserMode = 0;
-    private int browserTeam = 0;
     private int browserSelectIndex = 0;
 
     [Header("Team UI")]

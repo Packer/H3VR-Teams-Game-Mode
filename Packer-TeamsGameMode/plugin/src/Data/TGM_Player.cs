@@ -9,6 +9,8 @@ public class TGM_Player
 {
     [Header("Sosig")]
     public bool isSosig = false;    //is this a sosig
+    public string playerName;
+    public Sosig sosig;
 
     [Header("Human")]
     public int playerIndex = 0; //H3MP data

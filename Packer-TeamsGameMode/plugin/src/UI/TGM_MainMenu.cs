@@ -118,8 +118,11 @@ public class TGM_MainMenu : MonoBehaviour
         //Reset player Tracking
         TGM_Manager.instance.localPlayer.ResetPlayer();
 
+
+        GM.CurrentSceneSettings.SosigKillEvent += TGM_Manager.instance.OnSosigKilled;
         GM.CurrentSceneSettings.SosigKillEvent += TGM_Manager.instance.gamemode.OnSosigKilled;
         GM.CurrentSceneSettings.PlayerDeathFromIFFEvent += TGM_Manager.instance.gamemode.OnPlayerKilled;
+        GM.CurrentSceneSettings.PlayerDeathFromIFFEvent += TGM_Manager.instance.PlayerDeathEvent;
 
 
         OpenPage(Page.GameSettings);
@@ -212,6 +215,25 @@ public class TGM_MainMenu : MonoBehaviour
 
     public void StartGame()
     {
+        //Setup Sosig Teams
+        for (int t = 0; t < TGM_Manager.instance.team.Length; t++)
+        {
+            TGM_Team team = TGM_Manager.instance.team[t];
+
+            team.sosigsData.Clear();
+
+            for (int s = 0; s < team.sosigLimit; s++)
+            {
+                TGM_Player sosig = new TGM_Player()
+                {
+                    isSosig = true,
+                    playerName = TGM_NameDB.GetRandomName(),
+                    iff = t,
+                };
+                team.sosigsData.Add(sosig);
+            }
+        }
+
         TGM_Manager.instance.SetGameState(TGM_Manager.GameStateEnum.Pregame);
         OpenPage(Page.JoinTeam);
         TeamGameModePlugin.Logger.LogMessage($"Game Started");

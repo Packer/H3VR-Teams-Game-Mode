@@ -87,6 +87,7 @@ public class TGM_Settings
             intIncrement = 30,
             localOnly = false,
         },
+        /*
         new Setting
         {
             description = "Respawning:",
@@ -98,6 +99,7 @@ public class TGM_Settings
             intIncrement = 1,
             localOnly = false,
         },
+        */
         new Setting
         {
             description = "Show Friendlies:",
@@ -112,11 +114,11 @@ public class TGM_Settings
         new Setting
         {
             description = "Player Items Drop:",
-            settings = ["Disabled", "Enabled", "Weapons Only", "Ammo Only"],
+            settings = ["Disabled", "Enabled"],
             type = Setting.SettingType.Strings,
             value = 0,
             intMin = 0,
-            intMax = 3,
+            intMax = 1,
             intIncrement = 1,
             localOnly = false,
         },
@@ -142,24 +144,37 @@ public class TGM_Settings
             intIncrement = 250,
             localOnly = false,
         },
+        new Setting
+        {
+            description = "Item Spawner:",
+            settings = ["Disabled", "Enabled"],
+            type = Setting.SettingType.Strings,
+            value = 0,
+            intMin = 0,
+            intMax = 1,
+            intIncrement = 1,
+            localOnly = false,
+        },
     };
 }
 public enum TGMSettingEnum
 {
     ///<summary>"Disabled (Global)" = 0, "Enabled (Global)" = 1, "Set Per Class" = 2</summary>
-    SpawnLock = 0,
+    SpawnLock,
     ///<summary>"Map Default" = 0, # => 1</summary>
-    SpawnWaveTime = 1,
+    SpawnWaveTime,
     ///<summary>"Infinite" = 0, # => 1</summary>
-    TimeLimit = 2,
+    TimeLimit,
     ///<summary>"Disabled" = 0, "Enabled" = 1</summary>
-    CanRespawn = 3,
+    //CanRespawn = 3,
     ///<summary>"Disabled" = 0, "Enabled" = 1</summary>
-    ShowFriendlies = 4,
+    ShowFriendlies,
     ///<summary>"Disabled" = 0, "Enabled" = 1, "Weapons Only" = 2, "Ammo Only" = 3</summary>
-    PlayerItemsOnDeath = 5,
+    PlayerItemsOnDeath,
     ///<summary>"Disabled" = 0, "Enabled" = 1</summary>
-    SosigWeapons = 6,
+    SosigWeapons,
     ///<summary>"Set Per Class" = 0, # => 1</summary>
-    PlayerHealth = 7,
+    PlayerHealth,
+    ///<summary>"Disabled" = 0, "Enabled" = 1</summary>
+    ItemSpawner,
 }

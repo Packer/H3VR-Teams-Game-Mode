@@ -1,12 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
+﻿
 namespace TeamsGameMode;
 
 public class TGM_NameDB
 {
+    public static string GetRandomName()
+    {
+        return database[UnityEngine.Random.Range(0, database.Length)];
+    }
+
     public readonly static string[] database =
     {
         "🪦_mince_of_spades_🪦",

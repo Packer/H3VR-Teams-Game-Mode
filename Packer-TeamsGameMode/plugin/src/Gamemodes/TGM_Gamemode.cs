@@ -33,14 +33,15 @@ public class TGM_Gamemode
         TGM_Settings.SetSetting(TGMSettingEnum.SpawnLock, 2);
         TGM_Settings.SetSetting(TGMSettingEnum.SpawnWaveTime, 0);
         TGM_Settings.SetSetting(TGMSettingEnum.TimeLimit, 0);
-        TGM_Settings.SetSetting(TGMSettingEnum.CanRespawn, 1);
+        //TGM_Settings.SetSetting(TGMSettingEnum.CanRespawn, 1);
         TGM_Settings.SetSetting(TGMSettingEnum.ShowFriendlies, 1);
         TGM_Settings.SetSetting(TGMSettingEnum.PlayerItemsOnDeath, 0);
         TGM_Settings.SetSetting(TGMSettingEnum.SosigWeapons, 0);
         TGM_Settings.SetSetting(TGMSettingEnum.PlayerHealth, 0);
+        TGM_Settings.SetSetting(TGMSettingEnum.ItemSpawner, 0);
 
         //TODO Set per team values - Bots and and Objective
-        
+
     }
 
     /// <summary>
@@ -61,11 +62,18 @@ public class TGM_Gamemode
         //15 Seconds before game starts
         TGM_Manager.instance.StartCoroutine(TGM_Manager.instance.SetGameStateDelayed(TGM_Manager.GameStateEnum.Gameplay, gameStartDelay));
 
-        //First Wave in 15 seconds
-        for (int i = 0; i < TGM_Manager.instance.team.Length; i++)
+        
+        //Override Spawn Times
+        if(TGM_Settings.GetSetting(TGMSettingEnum.SpawnWaveTime) >= 1)
         {
-            TGM_Scene.instance.teams[i].teamSpawnTime = Time.time + gameStartDelay;
+            for (int i = 0; i < TGM_Manager.instance.team.Length; i++)
+            {
+                TGM_Scene.instance.teams[i].teamSpawnTime = TGM_Settings.GetSetting(TGMSettingEnum.SpawnWaveTime);
+            }
         }
+
+        //Item Spawner
+        TGM_Scene.instance.itemSpawner.gameObject.SetActive(TGM_Settings.GetSetting(TGMSettingEnum.ItemSpawner) == 1 ? true : false);
     }
 
     /// <summary>
@@ -89,7 +97,7 @@ public class TGM_Gamemode
             TGM_Manager.instance.team[i].Respawn();
         }
 
-        int lossIff = winIFF == 1 ? 1 : 0;
+        int lossIff = Global.GetEnemyIFF(winIFF);
         //Defeated Team has their weapons taken away
         for (int i = 0; i < TGM_Manager.instance.team[lossIff].sosigs.Count; i++)
         {
@@ -103,6 +111,9 @@ public class TGM_Gamemode
             }
 
         }
+
+        //End Game Screen
+        TGM_EndScreen.instance.SetEndScreen(true);
 
         //15 Seconds before game over
         TGM_Manager.instance.StartCoroutine(TGM_Manager.instance.SetGameStateDelayed(TGM_Manager.GameStateEnum.Gameover, gameOverDelay));
@@ -121,12 +132,15 @@ public class TGM_Gamemode
             TGM_Manager.instance.team[i].ClearAllTeamSosigs();
         }
 
-        //Clear player items
-        GM.CurrentPlayerBody.WipeQuickbeltContents();
+        //Clear player items if no Item Spawner
+        if(TGM_Settings.GetSetting(TGMSettingEnum.ItemSpawner) == 0)
+            GM.CurrentPlayerBody.WipeQuickbeltContents();
 
         //Unsubscribe to Kill Events
+        GM.CurrentSceneSettings.SosigKillEvent -= TGM_Manager.instance.OnSosigKilled;
         GM.CurrentSceneSettings.SosigKillEvent -= TGM_Manager.instance.gamemode.OnSosigKilled;
         GM.CurrentSceneSettings.PlayerDeathFromIFFEvent -= TGM_Manager.instance.gamemode.OnPlayerKilled;
+        GM.CurrentSceneSettings.PlayerDeathFromIFFEvent -= TGM_Manager.instance.PlayerDeathEvent;
 
         //Reset the gamemode to the same one!
         TGM_MainMenu.instance.SelectGamemode(index);
@@ -135,9 +149,18 @@ public class TGM_Gamemode
     /// <summary>
     /// Called each Update frame while in Gameplay Game State
     /// </summary>
-    public virtual void Update() 
+    public virtual void Update()
     {
-        
+        //Only update during gameplay
+        if (TGM_Manager.gameState != TGM_Manager.GameStateEnum.Gameplay)
+            return;
+
+        //If hit our custom Timelimit
+        if (TGM_Settings.GetSetting(TGMSettingEnum.TimeLimit) > 0)
+        {
+            if (Time.time - TGM_Manager.instance.startTime >= TGM_Settings.GetSetting(TGMSettingEnum.TimeLimit))
+                TGM_Manager.instance.SetGameState(TGM_Manager.GameStateEnum.Postgame);
+        }
     }
 
     /// <summary>

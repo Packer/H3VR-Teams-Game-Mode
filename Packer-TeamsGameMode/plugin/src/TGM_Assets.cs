@@ -18,6 +18,8 @@ namespace TeamsGameMode
 
         public TGM_Compass compass;
 
+        public TGM_EndScreen endScreen;
+
         public GameObject iffPrefab;
     }
 }

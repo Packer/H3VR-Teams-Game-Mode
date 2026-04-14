@@ -16,10 +16,8 @@ namespace TeamsGameMode
         public Transform target;
         public Vector3 targetOffset;
 
-        [SerializeField]
-        private LayerMask mask;
-        private RaycastHit hit = new RaycastHit();
-        private Ray ray;
+        public LayerMask mask;
+        private RaycastHit hit;
 
 
         void Awake()
@@ -38,7 +36,7 @@ namespace TeamsGameMode
                 return;
 
             Vector3 targetHead = target.position + (Vector3.up * 1.5f);
-            Vector3 targetBehind = target.position + (Vector3.up * 1.5f) - (transform.forward * 2);
+            Vector3 targetBehind = target.position + (Vector3.up * 1.5f) + (-transform.forward * 2);
 
             if (Physics.Linecast(targetHead, targetBehind, out hit, mask))
                 spectatorCamera.transform.position = Vector3.Slerp(spectatorCamera.transform.position, hit.point, Time.deltaTime);

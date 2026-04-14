@@ -43,9 +43,8 @@ public class TGM_TeamDeathmatch : TGM_Gamemode
     {
         base.Postgame();
 
-        int localIFF = TGM_Manager.instance.localPlayer.iff;
+        int localIFF = GM.CurrentPlayerBody.GetPlayerIFF();
 
-        //DISPLAY WIN OR LOSS DISPLAY here
         if (localIFF == winIFF || localIFF < 0)
             TGM_Manager.PlayAudio(TGM_Manager.PlayAudioEnum.TeamWon);
         else
@@ -72,9 +71,11 @@ public class TGM_TeamDeathmatch : TGM_Gamemode
         if (Networking.IsClient())
             return;
 
-        //Only Respawn during gameplay
-        if(TGM_Manager.gameState == TGM_Manager.GameStateEnum.Gameplay)
-            RespawnTime();
+        //Only update during gameplay
+        if (TGM_Manager.gameState != TGM_Manager.GameStateEnum.Gameplay)
+            return;
+
+        RespawnTime();
 
         //Check for Win Condition
         for (int i = 0; i < TGM_Manager.instance.team.Length; i++)
@@ -120,7 +121,7 @@ public class TGM_TeamDeathmatch : TGM_Gamemode
         {
             TGM_Compass.instance.CreateMarker(
                 TGM_Compass.instance.markerSprites[(int)TGM_Compass.MarkerEnum.Attack],
-                Color.red,
+                iff == 0 ? Color.red : Color.blue,
                 markerPoint);
         }
     }
@@ -154,7 +155,7 @@ public class TGM_TeamDeathmatch : TGM_Gamemode
         base.OnSosigKilled(s);
 
         //Score
-        AdjustTeamScore(s.GetIFF(), 1);
+        AdjustTeamScore(Global.GetEnemyIFF(s.GetIFF()), 1);
 
         //Remove from sosig team count
         for (int i = 0; i < TGM_Manager.instance.team.Length; i++)

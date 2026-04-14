@@ -50,9 +50,18 @@ public class TGM_ClassMenu : MonoBehaviour
 
     void Update()
     {
+        int iff = GM.CurrentPlayerBody.GetPlayerIFF();
         if (TGM_Manager.instance.localPlayer.awaitingRespawn)
         {
-            spawnButtonText.text = Mathf.Abs((Time.time - TGM_Manager.instance.team[TGM_Manager.instance.localPlayer.iff].respawnTime)).ToString("F2");
+            switch (TGM_Manager.gameState)
+            {
+                case TGM_Manager.GameStateEnum.Pregame:
+                    spawnButtonText.text = Mathf.Abs((Time.time - TGM_Manager.instance.startTime)).ToString("F2");
+                    break;
+                case TGM_Manager.GameStateEnum.Gameplay:
+                    spawnButtonText.text = Mathf.Abs((Time.time - TGM_Manager.instance.team[iff].respawnTime)).ToString("F2");
+                    break;
+            }
         }
     }
 

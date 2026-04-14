@@ -22,4 +22,6 @@ MonoBehaviour:
   spectator: {fileID: 114699512571440562, guid: 4a5a5410501e17b4484edbff9293520c,
     type: 2}
   compass: {fileID: 114163070363173658, guid: 2973ac72e3b83604e8eafa97b86fbd2f, type: 2}
+  endScreen: {fileID: 114232919354635554, guid: ea43b4f57118c914f9bd42f22e3370f2,
+    type: 2}
   iffPrefab: {fileID: 1483131967643206, guid: 47d81c0a2df0d264aab306d2300efa3b, type: 2}
