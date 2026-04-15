@@ -36,6 +36,8 @@ public class TGM_MainMenu : MonoBehaviour
     //Save Data?
     [Header("Page: Team Select")]
 
+    [Header("Page: Spectator")]
+    public Text spectateName;
 
     [Header("Gamemode Window")]
     public GameObject gamemodeBtnPrefab;
@@ -72,6 +74,9 @@ public class TGM_MainMenu : MonoBehaviour
             requestButton.SetActive(false);
             startButton.SetActive(true);
         }
+
+        //Default page
+        OpenPage(Page.Gamemode);
     }
 
 
@@ -204,7 +209,7 @@ public class TGM_MainMenu : MonoBehaviour
     // Methods
     //-------------------------------------------------------------------------------------
 
-    void OpenPage(Page index)
+    public void OpenPage(Page index)
     {
         for (int i = 0; i < pages.Length; i++)
         {

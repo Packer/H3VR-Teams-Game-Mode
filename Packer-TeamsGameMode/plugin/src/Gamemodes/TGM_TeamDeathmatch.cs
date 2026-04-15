@@ -30,13 +30,21 @@ public class TGM_TeamDeathmatch : TGM_Gamemode
         //Defaults
         for (int i = 0; i < 2; i++)
         {
-            TGM_Manager.instance.team[i].scoreGoal = 20;
+            TGM_Manager.instance.team[i].scoreGoal = 50;
         }
     }
 
     public override void Pregame()
     {
         base.Pregame();
+
+        //Set spawn areas to their respective teams
+        for (int i = 0; i < TGM_Manager.instance.team.Length; i++)
+        {
+            TGM_Manager.instance.team[i].currentSpawnArea.iff = i;
+        }
+
+        TGM_Scene.UpdateAllAreas();
     }
 
     public override void Postgame()

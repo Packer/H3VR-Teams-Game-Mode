@@ -205,6 +205,9 @@ public class TGM_Manager : MonoBehaviour
         //Remove Class Menu
         if(TGM_ClassMenu.instance != null)
             Destroy(TGM_ClassMenu.instance.gameObject);
+
+        //Update all areas
+        TGM_Scene.UpdateAllAreas();
     }
 
     public void PlayerDeathEvent(bool killedSelf, int iff)

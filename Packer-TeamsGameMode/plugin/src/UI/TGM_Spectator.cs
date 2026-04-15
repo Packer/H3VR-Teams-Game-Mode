@@ -2,6 +2,7 @@
 using UnityEngine.UI;
 using H3MP.Networking;
 using FistVR;
+using System.Collections.Generic;
 
 
 namespace TeamsGameMode
@@ -12,6 +13,8 @@ namespace TeamsGameMode
 
         public int targetPlayerIndex = 0;
         public Camera spectatorCamera;
+        public int frameRate = 30;
+        private float nextRenderTime = 0;
 
         public Transform target;
         public Vector3 targetOffset;
@@ -25,13 +28,25 @@ namespace TeamsGameMode
             instance = this;
         }
 
+        void Start()
+        {
+            //Give us something to look at
+            spectatorCamera.Render();
+        }
+
         void FixedUpdate()
         {
-            if (!spectatorCamera.gameObject.activeSelf)
-                return;
+            if (TGM_MainMenu.instance.pages[(int)TGM_MainMenu.Page.Spectator].activeSelf == false)
+            {
+                target = null;
+            }
+            else if (target == null)
+            {
+                //Next Sosig if we don't have something to look at
+                GetNextTarget(1);
+            }
 
-            if (target == null)
-                target = GetNewTarget(1);
+
             if (target == null)
                 return;
 
@@ -44,6 +59,14 @@ namespace TeamsGameMode
                 spectatorCamera.transform.position = Vector3.Slerp(spectatorCamera.transform.position, targetBehind, Time.deltaTime);
 
             spectatorCamera.transform.LookAt(targetHead);
+
+            
+            if (nextRenderTime <= Time.time)
+            {
+                spectatorCamera.Render();
+                nextRenderTime = Time.time + (1f / frameRate);
+            }
+            
         }
 
         public void GetNextTarget(int adjust)
@@ -56,52 +79,54 @@ namespace TeamsGameMode
             targetPlayerIndex += adjust;
 
             int sosigCount = 0;
-            int playerCount = 0;
+            //int playerCount = 0;
 
-            //Yay for no good Sosig Tracking
-            Sosig[] sosigs = FindObjectsOfType<Sosig>();
-            sosigCount = sosigs.Length;
+            //Collect all sosigs
+            List<TGM_Player> players = new List<TGM_Player>();
 
+            for (int t = 0; t < TGM_Manager.instance.team.Length; t++)
+            {
+                for (int d = 0; d < TGM_Manager.instance.team[t].sosigsData.Count; d++)
+                {
+                    if(TGM_Manager.instance.team[t].sosigsData[d].sosig != null)
+                        players.Add(TGM_Manager.instance.team[t].sosigsData[d]);
+                }
+            }
+            sosigCount = players.Count;
+
+            if (sosigCount == 0)
+                return null;
+
+            /*
             if (Networking.ServerRunning())
             {
                 //Include Players
                 playerCount = Networking.GetPlayerCount();
             }
+            */
 
-            int total = sosigCount + playerCount;
+            int total = sosigCount;// + playerCount;
 
-            if (targetPlayerIndex > total)
+            if (targetPlayerIndex >= total)
                 targetPlayerIndex = 0;
             else if (targetPlayerIndex < 0)
                 targetPlayerIndex = total - 1;
-            else
-                targetPlayerIndex++;
 
-            //Not a player
-            if (targetPlayerIndex > playerCount 
-                && sosigs[targetPlayerIndex] != null
-                && sosigs[targetPlayerIndex].Mustard > 0)
+            //Sosig Player
+            //if (targetPlayerIndex > playerCount 
+            if (players[targetPlayerIndex] != null
+                && players[targetPlayerIndex].sosig != null)
             {
-                return sosigs[targetPlayerIndex].transform;
+                spectatorCamera.Render();
+                TGM_MainMenu.instance.spectateName.text = players[targetPlayerIndex].playerName;
+                TGM_MainMenu.instance.spectateName.color = players[targetPlayerIndex].sosig.GetIFF() == 1 ? Color.blue : Color.red;
+                return players[targetPlayerIndex].sosig.transform;
             }
 
-            if (Networking.ServerRunning())
-                return Networking.GetPlayer(targetPlayerIndex).head;
+            //if (Networking.ServerRunning())
+            //    return Networking.GetPlayer(targetPlayerIndex).head;
 
             return null;
         }
-
-        public void Activate(bool state)
-        {
-            if (state)
-            {
-                spectatorCamera.gameObject.SetActive(true);
-            }
-            else
-            {
-                spectatorCamera.gameObject.SetActive(false);
-            }
-        }
-
     }
 }

@@ -89,6 +89,8 @@ public class TGM_Team
                 Vector3[] spawnPoint = Global.GetValidSpawnPoint(spawnArea);
                 Sosig s = CreateTeamSosig(_spawnOptions, spawnPoint[0], spawnArea.rotation);
 
+                TGM_Manager.instance.gamemode.OnSosigCreate(s);
+
                 if (CreateSosigEvent != null)
                     CreateSosigEvent.Invoke(s);
             }
@@ -174,6 +176,24 @@ public class TGM_Team
         }
 
         return sosig;
+    }
+
+    public void DisarmTeam()
+    {
+        //Remove players weapons
+        if(GM.CurrentPlayerBody.GetPlayerIFF() == iff)
+            TGM_Manager.instance.localPlayer.DestroyPlayersItems();
+
+        //Thats it, everyone has their weapons taken away
+        for (int i = 0; i < sosigs.Count; i++)
+        {
+            sosigs[i].DestroyAllHeldObjects();
+
+            for (int h = 0; h < sosigs[i].Hands.Count; h++)
+            {
+                sosigs[i].Hands[h].DropHeldObject();
+            }
+        }
     }
 
     public void ClearAllTeamSosigs()

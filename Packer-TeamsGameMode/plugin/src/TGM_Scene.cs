@@ -116,8 +116,20 @@ namespace TeamsGameMode
             TGM_Manager.instance.Setup();
         }
 
+        public static void UpdateAllAreas()
+        {
+            //Update all areas
+            for (int i = 0; i < instance.areas.Length; i++)
+            {
+                instance.areas[i].UpdateArea();
+            }
+
+        }
         void OnDrawGizmos()
         {
+            Color newColor = Color.green;
+            newColor.a = 0.2f;
+            Gizmos.color = newColor;
 
             if (teams != null)
             {
@@ -126,12 +138,21 @@ namespace TeamsGameMode
                     if (teams[i] == null)
                         continue;
 
-                    Color newColor = Color.green;
-                    newColor.a = 0.2f;
-                    Gizmos.color = newColor;
                     if (teams[i].respawnArea != null)
                         Gizmos.DrawCube(teams[i].respawnArea.position, teams[i].respawnArea.localScale / 2);
 
+                }
+            }
+
+            newColor = Color.yellow;
+            newColor.a = 0.2f;
+            Gizmos.color = newColor;
+            for (int i = 0; i < areas.Length; i++)
+            {
+                if (areas[i] != null && i + 1 < areas.Length && areas[i + 1] != null)
+                {
+                    if(areas[i].capturePoint != null && areas[i + 1].capturePoint != null)
+                        Gizmos.DrawLine(areas[i].capturePoint.position, areas[i + 1].capturePoint.position);
                 }
             }
 
@@ -139,7 +160,7 @@ namespace TeamsGameMode
 
             if (mainMenu != null)
             {
-                Color newColor = Color.grey;
+                newColor = Color.grey;
                 newColor.a = 0.2f;
                 Gizmos.color = newColor;
 
@@ -152,7 +173,7 @@ namespace TeamsGameMode
 
             if (teamSetupMenu != null)
             {
-                Color newColor = Color.grey;
+                newColor = Color.grey;
                 newColor.a = 0.2f;
                 Gizmos.color = newColor;
 
@@ -165,7 +186,7 @@ namespace TeamsGameMode
 
             if (profilesMenu != null)
             {
-                Color newColor = Color.grey;
+                newColor = Color.grey;
                 newColor.a = 0.2f;
                 Gizmos.color = newColor;
 

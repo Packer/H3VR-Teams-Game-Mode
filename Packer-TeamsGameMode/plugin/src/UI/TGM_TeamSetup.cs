@@ -37,22 +37,16 @@ public class TGM_TeamSetup : MonoBehaviour
 
     public void Setup()
     {
-        //Default select first team
-        //SelectTeam(0);
-
-        //Setup Spawn points
+        //Setup Default Spawn points
         for (int i = 0; i < TGM_Manager.instance.team.Length; i++)
         {
             TGM_Manager.instance.team[i].currentSpawnArea = TGM_Scene.instance.teams[i].startSpawnArea;
         }
 
         //Update all areas
-        for (int i = 0; i < TGM_Scene.instance.areas.Length; i++)
-        {
-            TGM_Scene.instance.areas[i].UpdateArea();
-        }
+        TGM_Scene.UpdateAllAreas();
 
-
+        //Settings
         UpdateSettings();
     }
 

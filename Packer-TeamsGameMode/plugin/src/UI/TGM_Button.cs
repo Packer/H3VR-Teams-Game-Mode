@@ -72,7 +72,7 @@ public class TGM_Button : MonoBehaviour
         if (iff == -3)
         {
             //Spectator
-
+            TGM_MainMenu.instance.OpenPage(TGM_MainMenu.Page.Spectator);
             return;
         }
 
@@ -86,6 +86,17 @@ public class TGM_Button : MonoBehaviour
         GM.CurrentSceneSettings.DeathResetPoint = TGM_Scene.instance.playerResetPoint;
         TGM_Scene.instance.playerResetPoint.SetPositionAndRotation(spawn.position, spawn.rotation);
         TGM_Manager.instance.gamemode.OnJoinTeam(iff);
+
+        //Update areas depending on Team
+        TGM_Scene.UpdateAllAreas();
+
+        //Set Main page back to team selection incase in spectator
+        TGM_MainMenu.instance.OpenPage(TGM_MainMenu.Page.JoinTeam);
+    }
+
+    public void AdjustSpectatorTarget(int amount)
+    {
+        TGM_Spectator.instance.GetNextTarget(amount);
     }
 
     void OnValidate()

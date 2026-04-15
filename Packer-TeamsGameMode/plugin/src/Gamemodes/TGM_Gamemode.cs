@@ -21,7 +21,7 @@ public class TGM_Gamemode
     public string description;
     public Sprite thumbnail;
 
-    public const float gameStartDelay = 30;
+    public const float gameStartDelay = 20;
     public const float gameOverDelay = 15;
 
     public int winIFF = -1;
@@ -97,19 +97,22 @@ public class TGM_Gamemode
             TGM_Manager.instance.team[i].Respawn();
         }
 
-        int lossIff = Global.GetEnemyIFF(winIFF);
-        //Defeated Team has their weapons taken away
-        for (int i = 0; i < TGM_Manager.instance.team[lossIff].sosigs.Count; i++)
+        //DRAW
+        if (winIFF == -1)
         {
-            TGM_Manager.instance.team[lossIff].sosigs[i].DestroyAllHeldObjects();
-            //IF DOESN'T WORK, look at sosig inventory and loop through Slots and DropHeldObject
-            //TGM_Manager.instance.team[lossIff].sosigs[i].Inventory.Slots;
-
-            for (int h = 0; h < TGM_Manager.instance.team[lossIff].sosigs[i].Hands.Count; h++)
+            for (int t = 0; t < TGM_Manager.instance.team.Length; t++)
             {
-                TGM_Manager.instance.team[lossIff].sosigs[i].Hands[h].DropHeldObject();
+                //Thats it, everyone has their weapons taken away
+                TGM_Manager.instance.team[t].DisarmTeam();
             }
+        }
+        else
+        {
+            //One Team won
+            int lossIff = Global.GetEnemyIFF(winIFF);
 
+            //Defeated Team has their weapons taken away
+            TGM_Manager.instance.team[lossIff].DisarmTeam();
         }
 
         //End Game Screen

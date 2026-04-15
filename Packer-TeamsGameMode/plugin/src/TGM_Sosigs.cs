@@ -23,11 +23,20 @@ namespace TeamsGameMode
         }
         */
 
-        public static void OrderSosigToLocations(Sosig sosig, List<Vector3> locations)
+        public static void OrderSosigToLocations(Sosig sosig, List<Vector3> locations, Sosig.SosigMoveSpeed moveSpeed = Sosig.SosigMoveSpeed.Running)
         {
+            /*
+            //Debug Sosig move locations
+            for (int i = 0; i < locations.Count; i++)
+            {
+                Debug.Log("SOSIG MOVE LOCATION " + i + " : " + locations[i]);
+            }
+            */
+
             List<Vector3> pathDirs = new List<Vector3> { locations[2], locations[2] };
             locations.RemoveAt(2);
             List<Vector3> pathPoints = locations;
+
 
             sosig.CommandPathTo(
                 pathPoints,
@@ -35,7 +44,7 @@ namespace TeamsGameMode
                 1,
                 Vector2.one * 4,
                 20f,
-                Sosig.SosigMoveSpeed.Running,
+                moveSpeed,
                 Sosig.PathLoopType.LoopEndless,
                 null,
                 0.2f,

@@ -604,6 +604,7 @@ MonoBehaviour:
   mainMenu: {fileID: 530380924}
   teamSetupMenu: {fileID: 975639887}
   profilesMenu: {fileID: 804684773}
+  itemSpawner: {fileID: 0}
   audioConfirm: {fileID: 0}
   audioPress: {fileID: 0}
   audioFail: {fileID: 0}
@@ -3513,16 +3514,6 @@ Prefab:
       propertyPath: m_Pivot.y
       value: 0.5
       objectReference: {fileID: 0}
-    - target: {fileID: 114467158141650572, guid: 1cae71bc260205e44bd3f1b93548ab77,
-        type: 2}
-      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
-      value: 
-      objectReference: {fileID: 1855679964}
-    - target: {fileID: 114551070531819092, guid: 1cae71bc260205e44bd3f1b93548ab77,
-        type: 2}
-      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
-      value: 
-      objectReference: {fileID: 1855679964}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 1cae71bc260205e44bd3f1b93548ab77, type: 2}
   m_IsPrefabParent: 0
@@ -3690,12 +3681,6 @@ Transform:
   m_Father: {fileID: 2072972514}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1855679964 stripped
-MonoBehaviour:
-  m_PrefabParentObject: {fileID: 114699512571440562, guid: 4a5a5410501e17b4484edbff9293520c,
-    type: 2}
-  m_PrefabInternal: {fileID: 1566922913}
-  m_Script: {fileID: -1413048692, guid: 2dad86f9e6b5aece0f7796226ce8c243, type: 3}
 --- !u!1 &1941292949
 GameObject:
   m_ObjectHideFlags: 0

@@ -1,299 +1,294 @@
 ﻿using FistVR;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using UnityEngine;
-using UnityEngine.AI;
 using Random = UnityEngine.Random;
 
-namespace TeamsGameMode
+namespace TeamsGameMode;
+
+public class TGM_Area : MonoBehaviour
 {
-    public class TGM_Area : MonoBehaviour
+    [HideInInspector]
+    public int iff = 0; //Which team currently owns this area
+
+    [Header("Gameplay")]
+    [Tooltip("The area which players can capture this point in if capturable")]
+    public Transform capturePoint;
+    [Tooltip("The location the objective will spawn, e.g. Flag for CTF")]
+    public Transform objective;
+
+    [Header("Player")]
+    [Tooltip("Area where players can spawn, can be scaled")]
+    public Transform[] spawnPoints;
+
+    [Header("Sosigs")]
+    [Tooltip("Area where sosigs can spawn, can be scaled")]
+    public Transform[] sosigSpawnPoints;
+    [Tooltip("Areas sosigs will navigate to when owned by enemies to find enemies")]
+    public Transform[] sosigAttackAreas;
+    [Tooltip("Defined areas sosigs will defend this Area")]
+    public Transform[] sosigDefendAreas;
+
+    [Header("Game Objects")]
+    [Tooltip("Friendly Objects that enable when owned by a friendly team")]
+    public GameObject[] friendlyObjects;
+    [Tooltip("Enemy Objects that are enabled when owned by an enemy team, e.g. Nav Blockers to stop enemies getting into spawn area")]
+    public GameObject[] enemyObjects;
+    [Tooltip("Neutral Objects that are enabled when owned by no team, e.g. Door on unused spawn room")]
+    public GameObject[] neutralObjects;
+
+
+    public void UpdateArea()
     {
-        [HideInInspector]
-        public int iff = 0; //Which team currently owns this area
-
-        [Header("Gameplay")]
-        [Tooltip("The area which players can capture this point in if capturable")]
-        public Transform capturePoint;
-        [Tooltip("The location the objective will spawn, e.g. Flag for CTF")]
-        public Transform objective;
-
-        [Header("Player")]
-        [Tooltip("Area where players can spawn, can be scaled")]
-        public Transform[] spawnPoints;
-
-        [Header("Sosigs")]
-        [Tooltip("Area where sosigs can spawn, can be scaled")]
-        public Transform[] sosigSpawnPoints;
-        [Tooltip("Areas sosigs will navigate to when owned by enemies to find enemies")]
-        public Transform[] sosigAttackAreas;
-        [Tooltip("Defined areas sosigs will defend this Area")]
-        public Transform[] sosigDefendAreas;
-
-        [Header("Game Objects")]
-        [Tooltip("Friendly Objects that enable when owned by a friendly team")]
-        public GameObject[] friendlyObjects;
-        [Tooltip("Enemy Objects that are enabled when owned by an enemy team, e.g. Nav Blockers to stop enemies getting into spawn area")]
-        public GameObject[] enemyObjects;
-        [Tooltip("Neutral Objects that are enabled when owned by no team, e.g. Door on unused spawn room")]
-        public GameObject[] neutralObjects;
-
-
-        public void UpdateArea()
+        int playerIFF = GM.CurrentPlayerBody.GetPlayerIFF();
+        //Ally/Friendly
+        if (iff == playerIFF)
         {
-            int playerIFF = GM.CurrentPlayerBody.GetPlayerIFF();
-            //Ally/Friendly
-            if (iff == playerIFF)
+            for (int i = 0; i < friendlyObjects.Length; i++)
             {
-                for (int i = 0; i < friendlyObjects.Length; i++)
-                {
-                    friendlyObjects[i].SetActive(true);
-                }
-                for (int i = 0; i < enemyObjects.Length; i++)
-                {
-                    enemyObjects[i].SetActive(false);
-                }
-                for (int i = 0; i < neutralObjects.Length; i++)
-                {
-                    neutralObjects[i].SetActive(false);
-                }
+                friendlyObjects[i].SetActive(true);
             }
-            else if (iff != playerIFF) //Enemy
+            for (int i = 0; i < enemyObjects.Length; i++)
             {
-                for (int i = 0; i < friendlyObjects.Length; i++)
-                {
-                    friendlyObjects[i].SetActive(false);
-                }
-                for (int i = 0; i < enemyObjects.Length; i++)
-                {
-                    enemyObjects[i].SetActive(true);
-                }
-                for (int i = 0; i < neutralObjects.Length; i++)
-                {
-                    neutralObjects[i].SetActive(false);
-                }
+                enemyObjects[i].SetActive(false);
             }
-            else //Neutral
+            for (int i = 0; i < neutralObjects.Length; i++)
             {
-                for (int i = 0; i < friendlyObjects.Length; i++)
+                neutralObjects[i].SetActive(false);
+            }
+        }
+        else if (iff != playerIFF) //Enemy
+        {
+            for (int i = 0; i < friendlyObjects.Length; i++)
+            {
+                friendlyObjects[i].SetActive(false);
+            }
+            for (int i = 0; i < enemyObjects.Length; i++)
+            {
+                enemyObjects[i].SetActive(true);
+            }
+            for (int i = 0; i < neutralObjects.Length; i++)
+            {
+                neutralObjects[i].SetActive(false);
+            }
+        }
+        else //Neutral
+        {
+            for (int i = 0; i < friendlyObjects.Length; i++)
+            {
+                friendlyObjects[i].SetActive(false);
+            }
+            for (int i = 0; i < enemyObjects.Length; i++)
+            {
+                enemyObjects[i].SetActive(false);
+            }
+            for (int i = 0; i < neutralObjects.Length; i++)
+            {
+                neutralObjects[i].SetActive(true);
+            }
+        }
+    }
+
+    /// <summary>
+    /// Returns 2 patrol points and 3rd index as rotation 
+    /// </summary>
+    /// <returns></returns>
+    public List<Vector3> GetRandomAttackArea()
+    {
+        Transform area = sosigAttackAreas[Random.Range(0, sosigAttackAreas.Length)];
+        return GetRandomAreaPositions(area);
+    }
+
+    public List<Vector3> GetRandomDefendArea()
+    {
+        Transform area = sosigDefendAreas[Random.Range(0, sosigAttackAreas.Length)];
+        return GetRandomAreaPositions(area);
+    }
+
+    private List<Vector3> GetRandomAreaPositions(Transform area)
+    {
+        List<Vector3> locations = new List<Vector3>();
+
+        Vector3 areaScale = area.localScale / 2;
+
+        for (int i = 0; i < 2; i++)
+        {
+            Vector3 pos = area.position + new Vector3(
+                Random.Range(-areaScale.x, areaScale.x),
+                Random.Range(-areaScale.y, areaScale.y),
+                Random.Range(-areaScale.z, areaScale.z));
+
+            //TODO NAV MESH SANITY CHECK
+
+            locations.Add(pos);
+        }
+
+        //Look Direction
+        locations.Add(area.rotation.eulerAngles);
+
+        return locations;
+    }
+
+    public static Vector3[] attackIcon = {Vector3.up, (Vector3.up * 0.5f) + (Vector3.left * 0.5f), (Vector3.up * 0.5f) + (Vector3.right * 0.5f) };
+
+    public void PlaceAllMarkersOnGround()
+    {
+        /*
+        //Patrol Paths
+        for (int x = 0; x < patrolPaths.Length; x++)
+        {
+            for (int y = 0; y < patrolPaths[x].patrolPoints.Count; y++)
+            {
+                if (Physics.Raycast(patrolPaths[x].patrolPoints[y].position, Vector3.down, out rayHit, 200f))
                 {
-                    friendlyObjects[i].SetActive(false);
-                }
-                for (int i = 0; i < enemyObjects.Length; i++)
-                {
-                    enemyObjects[i].SetActive(false);
-                }
-                for (int i = 0; i < neutralObjects.Length; i++)
-                {
-                    neutralObjects[i].SetActive(true);
+                    patrolPaths[x].patrolPoints[y].position = rayHit.point + (Vector3.up * 0.05f);
                 }
             }
         }
 
-        /// <summary>
-        /// Returns 2 patrol points and 3rd index as rotation 
-        /// </summary>
-        /// <returns></returns>
-        public List<Vector3> GetRandomAttackArea()
+        //Guards
+        for (int i = 0; i < guardPoints.Count; i++)
         {
-            Transform area = sosigAttackAreas[Random.Range(0, sosigAttackAreas.Length)];
-            return GetRandomAreaPositions(area);
+            if (Physics.Raycast(guardPoints[i].position, Vector3.down, out rayHit, 200f))
+            {
+                guardPoints[i].position = rayHit.point + (Vector3.up * 0.05f);
+            }
         }
 
-        public List<Vector3> GetRandomDefendArea()
+        //Sniper
+        for (int i = 0; i < sniperPoints.Count; i++)
         {
-            Transform area = sosigDefendAreas[Random.Range(0, sosigAttackAreas.Length)];
-            return GetRandomAreaPositions(area);
+            if (Physics.Raycast(sniperPoints[i].position, Vector3.down, out rayHit, 200f))
+            {
+                sniperPoints[i].position = rayHit.point + (Vector3.up * 0.05f);
+            }
         }
 
-        private List<Vector3> GetRandomAreaPositions(Transform area)
+        //Rabbit Holes
+        for (int i = 0; i < sosigSpawns.Length; i++)
         {
-            List<Vector3> locations = new List<Vector3>();
-
-            Vector3 areaScale = area.localScale / 2;
-
-            for (int i = 0; i < 2; i++)
+            if (Physics.Raycast(sosigSpawns[i].position, Vector3.down, out rayHit, 200f))
             {
-                Vector3 pos = area.position + new Vector3(
-                    Random.Range(-areaScale.x, areaScale.x),
-                    Random.Range(-areaScale.y, areaScale.y),
-                    Random.Range(-areaScale.z, areaScale.z));
-
-                //TODO NAV MESH SANITY CHECK
-
-                locations.Add(pos);
+                sosigSpawns[i].position = rayHit.point + (Vector3.up * 0.05f);
             }
-
-            //Look Direction
-            locations.Add(area.rotation.eulerAngles);
-
-            return locations;
         }
 
-        public static Vector3[] attackIcon = {Vector3.up, (Vector3.up * 0.5f) + (Vector3.left * 0.5f), (Vector3.up * 0.5f) + (Vector3.right * 0.5f) };
-
-        public void PlaceAllMarkersOnGround()
+        //Squad Waypoint
+        if (Physics.Raycast(squadPoint.position, Vector3.down, out rayHit, 200f))
         {
-            /*
-            //Patrol Paths
-            for (int x = 0; x < patrolPaths.Length; x++)
-            {
-                for (int y = 0; y < patrolPaths[x].patrolPoints.Count; y++)
-                {
-                    if (Physics.Raycast(patrolPaths[x].patrolPoints[y].position, Vector3.down, out rayHit, 200f))
-                    {
-                        patrolPaths[x].patrolPoints[y].position = rayHit.point + (Vector3.up * 0.05f);
-                    }
-                }
-            }
-
-            //Guards
-            for (int i = 0; i < guardPoints.Count; i++)
-            {
-                if (Physics.Raycast(guardPoints[i].position, Vector3.down, out rayHit, 200f))
-                {
-                    guardPoints[i].position = rayHit.point + (Vector3.up * 0.05f);
-                }
-            }
-
-            //Sniper
-            for (int i = 0; i < sniperPoints.Count; i++)
-            {
-                if (Physics.Raycast(sniperPoints[i].position, Vector3.down, out rayHit, 200f))
-                {
-                    sniperPoints[i].position = rayHit.point + (Vector3.up * 0.05f);
-                }
-            }
-
-            //Rabbit Holes
-            for (int i = 0; i < sosigSpawns.Length; i++)
-            {
-                if (Physics.Raycast(sosigSpawns[i].position, Vector3.down, out rayHit, 200f))
-                {
-                    sosigSpawns[i].position = rayHit.point + (Vector3.up * 0.05f);
-                }
-            }
-
-            //Squad Waypoint
-            if (Physics.Raycast(squadPoint.position, Vector3.down, out rayHit, 200f))
-            {
-                squadPoint.position = rayHit.point + (Vector3.up * 0.05f);
-            }
-
-            //Respawn
-            if (Physics.Raycast(respawn.position, Vector3.down, out rayHit, 200f))
-            {
-                respawn.position = rayHit.point + (Vector3.up * 0.05f);
-            }
-            */
+            squadPoint.position = rayHit.point + (Vector3.up * 0.05f);
         }
 
-
-        void OnDrawGizmos()
+        //Respawn
+        if (Physics.Raycast(respawn.position, Vector3.down, out rayHit, 200f))
         {
+            respawn.position = rayHit.point + (Vector3.up * 0.05f);
+        }
+        */
+    }
 
-            if (objective != null)
+
+    void OnDrawGizmos()
+    {
+
+        if (objective != null)
+        {
+            Gizmos.color = new Color(0.99f, 0.75f, 0);
+            Vector3 upPos = objective.position + (Vector3.up * 2);
+            Vector3 forPos = upPos + (Vector3.down * 0.25f) + (objective.forward / 2);
+
+            //Draw Flag
+            Gizmos.DrawLine(objective.position, upPos);
+            Gizmos.DrawLine(upPos, forPos);
+            Gizmos.DrawLine(forPos, objective.position + (Vector3.up * 1.5f));
+        }
+
+        if (spawnPoints != null)
+        {
+            Color newGreen = Color.green;
+            newGreen.a = 0.2f;
+            Gizmos.color = newGreen;
+            for (int i = 0; i < spawnPoints.Length; i++)
             {
-                Gizmos.color = new Color(0.99f, 0.75f, 0);
-                Vector3 upPos = objective.position + (Vector3.up * 2);
-                Vector3 forPos = upPos + (Vector3.down * 0.25f) + (objective.forward / 2);
+                if (spawnPoints[i] == null)
+                    continue;
 
-                //Draw Flag
-                Gizmos.DrawLine(objective.position, upPos);
-                Gizmos.DrawLine(upPos, forPos);
-                Gizmos.DrawLine(forPos, objective.position + (Vector3.up * 1.5f));
+                Gizmos.DrawCube(spawnPoints[i].position, spawnPoints[i].localScale / 2);
+                Vector3 wireBottom = (spawnPoints[i].localScale / 2);
+                wireBottom.y = 0.001f;
+                Vector3 cubeBottom = spawnPoints[i].position + (Vector3.down * (spawnPoints[i].localScale.y * 0.25f));
+                Gizmos.DrawWireCube(cubeBottom, wireBottom);
+                Gizmos.DrawLine(spawnPoints[i].position, spawnPoints[i].position + spawnPoints[i].forward);
             }
+        }
 
-            if (spawnPoints != null)
+        if (sosigSpawnPoints != null)
+        {
+            Color newGreen = new Color(0.999f, 0.5f, 0);
+            newGreen.a = 0.2f;
+            Gizmos.color = newGreen;
+            for (int i = 0; i < sosigSpawnPoints.Length; i++)
             {
-                Color newGreen = Color.green;
-                newGreen.a = 0.2f;
-                Gizmos.color = newGreen;
-                for (int i = 0; i < spawnPoints.Length; i++)
+                if (sosigSpawnPoints[i] == null)
+                    continue;
+
+                Gizmos.DrawCube(sosigSpawnPoints[i].position, sosigSpawnPoints[i].localScale / 2);
+                Vector3 wireBottom = (sosigSpawnPoints[i].localScale / 2);
+                wireBottom.y = 0.001f;
+                Vector3 cubeBottom = sosigSpawnPoints[i].position + (Vector3.down * (sosigSpawnPoints[i].localScale.y * 0.25f));
+                Gizmos.DrawWireCube(cubeBottom, wireBottom);
+                Gizmos.DrawLine(sosigSpawnPoints[i].position, sosigSpawnPoints[i].position + sosigSpawnPoints[i].forward);
+            }
+        }
+
+        if (sosigAttackAreas != null)
+        {
+            Color newColor = Color.red;
+            newColor.a = 0.25f;
+            Gizmos.color = newColor;
+            for (int i = 0; i < sosigAttackAreas.Length; i++)
+            {
+                Gizmos.DrawCube(sosigAttackAreas[i].position, sosigAttackAreas[i].localScale / 2);
+                for (int x = 0; x < attackIcon.Length; x++)
                 {
-                    if (spawnPoints[i] == null)
-                        continue;
-
-                    Gizmos.DrawCube(spawnPoints[i].position, spawnPoints[i].localScale / 2);
-                    Vector3 wireBottom = (spawnPoints[i].localScale / 2);
-                    wireBottom.y = 0.001f;
-                    Vector3 cubeBottom = spawnPoints[i].position + (Vector3.down * (spawnPoints[i].localScale.y * 0.25f));
-                    Gizmos.DrawWireCube(cubeBottom, wireBottom);
-                    Gizmos.DrawLine(spawnPoints[i].position, spawnPoints[i].position + spawnPoints[i].forward);
+                    Gizmos.DrawLine(sosigAttackAreas[i].position, sosigAttackAreas[i].position + attackIcon[x]);
                 }
+                Gizmos.DrawWireCube(sosigAttackAreas[i].position, sosigAttackAreas[i].localScale / 2);
             }
+        }
 
-            if (sosigSpawnPoints != null)
+        if (sosigDefendAreas != null)
+        {
+            Vector3 BL = (Vector3.up * 0.5f) + (Vector3.left * 0.5f);
+            Vector3 TL = (Vector3.up * 0.5f) + (Vector3.left * 0.5f) + (Vector3.up * 0.5f);
+            Vector3 BR = (Vector3.up * 0.5f) + (Vector3.right * 0.5f);
+            Vector3 TR = (Vector3.up * 0.5f) + (Vector3.right * 0.5f) + (Vector3.up * 0.5f);
+
+
+
+            Color newColor = Color.blue;
+            newColor.a = 0.25f;
+            Gizmos.color = newColor;
+            for (int i = 0; i < sosigDefendAreas.Length; i++)
             {
-                Color newGreen = new Color(0.999f, 0.5f, 0);
-                newGreen.a = 0.2f;
-                Gizmos.color = newGreen;
-                for (int i = 0; i < sosigSpawnPoints.Length; i++)
-                {
-                    if (sosigSpawnPoints[i] == null)
-                        continue;
+                Gizmos.DrawCube(sosigDefendAreas[i].position, sosigDefendAreas[i].localScale / 2);
+                Gizmos.DrawWireCube(sosigDefendAreas[i].position, sosigDefendAreas[i].localScale / 2);
 
-                    Gizmos.DrawCube(sosigSpawnPoints[i].position, sosigSpawnPoints[i].localScale / 2);
-                    Vector3 wireBottom = (sosigSpawnPoints[i].localScale / 2);
-                    wireBottom.y = 0.001f;
-                    Vector3 cubeBottom = sosigSpawnPoints[i].position + (Vector3.down * (sosigSpawnPoints[i].localScale.y * 0.25f));
-                    Gizmos.DrawWireCube(cubeBottom, wireBottom);
-                    Gizmos.DrawLine(sosigSpawnPoints[i].position, sosigSpawnPoints[i].position + sosigSpawnPoints[i].forward);
-                }
+                Gizmos.DrawLine(sosigDefendAreas[i].position, sosigDefendAreas[i].position + BL);
+                Gizmos.DrawLine(sosigDefendAreas[i].position, sosigDefendAreas[i].position + BR);
+                Gizmos.DrawLine(sosigDefendAreas[i].position + BL, sosigDefendAreas[i].position + TL);
+                Gizmos.DrawLine(sosigDefendAreas[i].position + BR, sosigDefendAreas[i].position + TR);
+                Gizmos.DrawLine(sosigDefendAreas[i].position + TL, sosigDefendAreas[i].position + TR);
             }
+        }
 
-            if (sosigAttackAreas != null)
-            {
-                Color newColor = Color.red;
-                newColor.a = 0.25f;
-                Gizmos.color = newColor;
-                for (int i = 0; i < sosigAttackAreas.Length; i++)
-                {
-                    Gizmos.DrawCube(sosigAttackAreas[i].position, sosigAttackAreas[i].localScale / 2);
-                    for (int x = 0; x < attackIcon.Length; x++)
-                    {
-                        Gizmos.DrawLine(sosigAttackAreas[i].position, sosigAttackAreas[i].position + attackIcon[x]);
-                    }
-                    Gizmos.DrawWireCube(sosigAttackAreas[i].position, sosigAttackAreas[i].localScale / 2);
-                }
-            }
+        //MATRIX
 
-            if (sosigDefendAreas != null)
-            {
-                Vector3 BL = (Vector3.up * 0.5f) + (Vector3.left * 0.5f);
-                Vector3 TL = (Vector3.up * 0.5f) + (Vector3.left * 0.5f) + (Vector3.up * 0.5f);
-                Vector3 BR = (Vector3.up * 0.5f) + (Vector3.right * 0.5f);
-                Vector3 TR = (Vector3.up * 0.5f) + (Vector3.right * 0.5f) + (Vector3.up * 0.5f);
-
-
-
-                Color newColor = Color.blue;
-                newColor.a = 0.25f;
-                Gizmos.color = newColor;
-                for (int i = 0; i < sosigDefendAreas.Length; i++)
-                {
-                    Gizmos.DrawCube(sosigDefendAreas[i].position, sosigDefendAreas[i].localScale / 2);
-                    Gizmos.DrawWireCube(sosigDefendAreas[i].position, sosigDefendAreas[i].localScale / 2);
-
-                    Gizmos.DrawLine(sosigDefendAreas[i].position, sosigDefendAreas[i].position + BL);
-                    Gizmos.DrawLine(sosigDefendAreas[i].position, sosigDefendAreas[i].position + BR);
-                    Gizmos.DrawLine(sosigDefendAreas[i].position + BL, sosigDefendAreas[i].position + TL);
-                    Gizmos.DrawLine(sosigDefendAreas[i].position + BR, sosigDefendAreas[i].position + TR);
-                    Gizmos.DrawLine(sosigDefendAreas[i].position + TL, sosigDefendAreas[i].position + TR);
-                }
-            }
-
-            //MATRIX
-
-            if (capturePoint != null && capturePoint.gameObject.activeSelf == true)
-            {
-                Gizmos.matrix = Matrix4x4.TRS(capturePoint.position, capturePoint.rotation, capturePoint.lossyScale / 2);
-                Gizmos.color = new Color(0.75f, 0, 1f, 0.25f);
-                Gizmos.DrawCube(Vector3.zero, Vector3.one);
-                Gizmos.DrawWireCube(Vector3.zero, Vector3.one);
-            }
+        if (capturePoint != null && capturePoint.gameObject.activeSelf == true)
+        {
+            Gizmos.matrix = Matrix4x4.TRS(capturePoint.position, capturePoint.rotation, capturePoint.lossyScale / 2);
+            Gizmos.color = new Color(0.75f, 0, 1f, 0.25f);
+            Gizmos.DrawCube(Vector3.zero, Vector3.one);
+            Gizmos.DrawWireCube(Vector3.zero, Vector3.one);
         }
     }
 }
