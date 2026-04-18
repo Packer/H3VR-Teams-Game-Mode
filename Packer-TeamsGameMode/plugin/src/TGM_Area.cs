@@ -20,6 +20,9 @@ public class TGM_Area : MonoBehaviour
     [Tooltip("The map defined objective time for this area, e.g. capture point time")]
     public float objectiveTime = 14f;
 
+    public SpawnPoints[] spawns = new SpawnPoints[2];
+
+    
     [Header("Player")]
     [Tooltip("Area where players can spawn, can be scaled")]
     public Transform[] spawnPoints;
@@ -31,6 +34,7 @@ public class TGM_Area : MonoBehaviour
     public Transform[] sosigAttackAreas;
     [Tooltip("Defined areas sosigs will defend this Area")]
     public Transform[] sosigDefendAreas;
+    
 
     [Header("Game Objects")]
     [Tooltip("Friendly Objects that enable when owned by a friendly team")]
@@ -40,6 +44,21 @@ public class TGM_Area : MonoBehaviour
     [Tooltip("Neutral Objects that are enabled when owned by no team, e.g. Door on unused spawn room")]
     public GameObject[] neutralObjects;
 
+    [SerializeField]
+    public class SpawnPoints()
+    {
+        [Header("Player")]
+        [Tooltip("Area where players can spawn, can be scaled")]
+        public Transform[] spawnPoints;
+
+        [Header("Sosigs")]
+        [Tooltip("Area where sosigs can spawn, can be scaled")]
+        public Transform[] sosigSpawnPoints;
+        [Tooltip("Areas sosigs will navigate to when owned by enemies to find enemies")]
+        public Transform[] sosigAttackAreas;
+        [Tooltip("Defined areas sosigs will defend this Area")]
+        public Transform[] sosigDefendAreas;
+    }
 
     public void UpdateArea()
     {
@@ -92,6 +111,23 @@ public class TGM_Area : MonoBehaviour
         }
     }
 
+    public void OpenArea()
+    {
+        for (int i = 0; i < friendlyObjects.Length; i++)
+        {
+            friendlyObjects[i].SetActive(true);
+        }
+        for (int i = 0; i < enemyObjects.Length; i++)
+        {
+            enemyObjects[i].SetActive(false);
+        }
+        for (int i = 0; i < neutralObjects.Length; i++)
+        {
+            neutralObjects[i].SetActive(false);
+        }
+
+    }
+
     /// <summary>
     /// Returns 2 patrol points and 3rd index as rotation 
     /// </summary>
@@ -107,6 +143,11 @@ public class TGM_Area : MonoBehaviour
         Transform area = sosigDefendAreas[Random.Range(0, sosigAttackAreas.Length)];
         return GetRandomAreaPositions(area);
     }
+    public List<Vector3> GetObjectiveArea()
+    {
+        Transform area = objective;
+        return GetRandomAreaPositions(area);
+    }
 
     private List<Vector3> GetRandomAreaPositions(Transform area)
     {
@@ -120,8 +161,6 @@ public class TGM_Area : MonoBehaviour
                 Random.Range(-areaScale.x, areaScale.x),
                 Random.Range(-areaScale.y, areaScale.y),
                 Random.Range(-areaScale.z, areaScale.z));
-
-            //TODO NAV MESH SANITY CHECK
 
             locations.Add(pos);
         }

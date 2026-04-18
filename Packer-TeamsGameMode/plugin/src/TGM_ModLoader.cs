@@ -30,6 +30,10 @@ public class TGM_ModLoader
 
         string path = Paths.PluginPath + "/Packer-Teams_Game_Mode/teamgamemode.tgm";
 
+        if (!Directory.Exists(path))
+            path = Paths.PluginPath + "/Teams_Game_Mode/teamgamemode.tgm";
+
+
         if (!loadedAssets)
         {
             AssetBundleCreateRequest asyncBundleRequest

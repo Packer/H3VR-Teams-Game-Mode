@@ -216,7 +216,7 @@ public class TGM_MainMenu : MonoBehaviour
             }
         }
 
-        if (TeamGameModePlugin.h3mp)
+        if (Networking.H3MP)
         {
             //Send Settings
 
@@ -225,7 +225,7 @@ public class TGM_MainMenu : MonoBehaviour
 
     public void RequestSettings()
     {
-        if (TeamGameModePlugin.h3mp)
+        if (Networking.H3MP)
         {
             //Request settings from Host
         }

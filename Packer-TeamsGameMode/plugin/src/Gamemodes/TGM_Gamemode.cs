@@ -10,6 +10,9 @@ namespace TeamsGameMode;
 [Serializable]
 public class TGM_Gamemode
 {
+    public const int redIFF = 0;
+    public const int blueIFF = 1;
+
     public string name;
     public string description;
     public Sprite thumbnail;
@@ -113,6 +116,12 @@ public class TGM_Gamemode
             TGM_Manager.instance.team[lossIff].DisarmTeam();
         }
 
+        //Open All Areas
+        for (int i = 0; i < TGM_Scene.instance.areas.Length; i++)
+        {
+            TGM_Scene.instance.areas[i].OpenArea();
+        }
+
         //End Game Screen
         TGM_EndScreen.instance.SetEndScreen(true);
 
@@ -156,6 +165,14 @@ public class TGM_Gamemode
             if (meats[i] != null)
                 meats[i].KillMe();
         }
+
+        //Clear Dispensers
+        MF2_Dispenser[] dispensers = GameObject.FindObjectsOfType<MF2_Dispenser>();
+        for (int i = 0; i < dispensers.Length; i++)
+        {
+            if (dispensers[i] != null)
+                dispensers[i].DestroyMe();
+        }        
     }
 
     /// <summary>
@@ -170,6 +187,7 @@ public class TGM_Gamemode
         //If hit our custom Timelimit
         if (TGM_Settings.GetSetting(TGMSettingEnum.TimeLimit) > 0)
         {
+            winIFF = -1;    //Default to Draw
             if (Time.time - TGM_Manager.instance.startTime >= TGM_Settings.GetSetting(TGMSettingEnum.TimeLimit))
                 TGM_Manager.instance.SetGameState(TGM_Manager.GameStateEnum.Postgame);
         }
@@ -194,15 +212,15 @@ public class TGM_Gamemode
     /// <summary>
     /// Method to adjust a teams score
     /// </summary>
-    /// <param name="teamID"></param>
+    /// <param name="teamIFF"></param>
     /// <param name="amount"></param>
-    public virtual void AdjustTeamScore(int teamID, int amount)
+    public virtual void AdjustTeamScore(int teamIFF, int amount)
     {
-        TeamGameModePlugin.Logger.LogDebug($"Gamemode: Adjust Team:" + teamID + " Score: " + amount);
+        TeamGameModePlugin.Logger.LogDebug($"Gamemode: Adjust Team:" + teamIFF + " Score: " + amount);
 
         if (TGM_Manager.gameState != TGM_Manager.GameStateEnum.Gameplay)
             return;
-        TGM_Manager.instance.team[teamID].currentScore += amount;
+        TGM_Manager.instance.team[teamIFF].currentScore += amount;
     }
 
     public virtual void OnSosigCreate(Sosig s)

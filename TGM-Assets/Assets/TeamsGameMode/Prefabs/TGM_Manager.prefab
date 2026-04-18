@@ -161,6 +161,9 @@ MonoBehaviour:
   m_Script: {fileID: -141355557, guid: 2dad86f9e6b5aece0f7796226ce8c243, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  gamemodeThumbnails:
+  - {fileID: 21300000, guid: 28259100d0760ec40b803b473db29cec, type: 3}
+  - {fileID: 21300000, guid: 6099e35862ceebd44bfa1f9c59b81325, type: 3}
   teamCount: 2
   gamemode:
     name: 
@@ -191,3 +194,7 @@ MonoBehaviour:
   audioElimination: {fileID: 8300000, guid: 040457098d94e66408b4b3ff0677fe91, type: 3}
   audioTeamWon: {fileID: 8300000, guid: b8310e55114bf1540a257f6f3e51c72e, type: 3}
   audioTeamLost: {fileID: 8300000, guid: 23fdffe8715af4c41aa87a29f79311a6, type: 3}
+  audioObjectiveEnemyCaptured: {fileID: 8300000, guid: 96814470e2feb9f4e9285700fe26508f,
+    type: 3}
+  audioObjectiveFriendlyCaptured: {fileID: 8300000, guid: 1c133bfc52e060142807424337c101b7,
+    type: 3}

@@ -116,8 +116,7 @@ public class TGM_ClassMenu : MonoBehaviour
             return;
         }
 
-        int team = TGM_Manager.instance.localPlayer.iff;
-
+        int team = GM.CurrentPlayerBody.GetPlayerIFF();
         
         //Spawn Locking Per class?
         if (TGM_Settings.GetSetting(TGMSettingEnum.SpawnLock) == 2)
@@ -144,7 +143,7 @@ public class TGM_ClassMenu : MonoBehaviour
         //Spawn our sub classes items
         for (int x = 0; x < subClass.items.Length; x++)
         {
-            SpawnItemSet(subClass.items[x]);
+            SpawnItemSet(subClass.items[x], team);
         }
     }
 
@@ -160,13 +159,16 @@ public class TGM_ClassMenu : MonoBehaviour
         return spawnPoint;
     }
 
-    public static void SpawnItemSet(TGM_PlayerClass.ItemSet itemSet)
+    public static void SpawnItemSet(TGM_PlayerClass.ItemSet itemSet, int iff)
     {
         FVRObject spawnFVRObject = Global.GetObjectID(itemSet.objectID[Random.Range(0, itemSet.objectID.Length)]);
 
         //Spawn Object IDs
         for (int i = 0; i < itemSet.objectCount; i++)
         {
+            if (itemSet.team != -1 && itemSet.team != iff)
+                continue;
+
             FVRPhysicalObject newItem = null;
 
             //Randomise each Object
@@ -229,12 +231,17 @@ public class TGM_ClassMenu : MonoBehaviour
                     //Spawn the Container
                     if (fvrContainer != null)
                     {
-                        spawnContainer = Global.SpawnFVRObject(
-                            fvrContainer,
-                            instance.ammoSpawns[spawnMainIndex].position + (Vector3.up * spawnMainOffset),
-                            instance.ammoSpawns[spawnMainIndex].rotation.eulerAngles);
-                    }
+                        for (int a = 0; a < itemSet.ammoCount; a++)
+                        {
+                            spawnContainer = Global.SpawnFVRObject(
+                                fvrContainer,
+                                instance.ammoSpawns[spawnMainIndex].position + (Vector3.up * 0.1f) + (Vector3.right * 0.1f * a),
+                                instance.ammoSpawns[spawnMainIndex].rotation.eulerAngles);
 
+                            if (spawnContainer != null)
+                                TGM_Manager.instance.localPlayer.playersItems.Add(spawnContainer);
+                        }
+                    }
                 }
 
                 // Cartridge / Round / Shell 
@@ -272,8 +279,11 @@ public class TGM_ClassMenu : MonoBehaviour
                                 //Spawn raw round
                                 spawnCartridge = Global.SpawnFVRObject(
                                     fvrCartridge,
-                                    instance.ammoSpawns[spawnMainIndex].position + (Vector3.up * spawnMainOffset),
+                                    instance.ammoSpawns[spawnMainIndex].position + (Vector3.up * 0.05f * c) + (Vector3.right * 0.025f * c),
                                     instance.ammoSpawns[spawnMainIndex].rotation.eulerAngles);
+
+                                if (spawnCartridge != null)
+                                    TGM_Manager.instance.localPlayer.playersItems.Add(spawnCartridge);
                             }
                         }
                     }

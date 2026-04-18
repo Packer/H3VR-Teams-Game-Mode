@@ -1,0 +1,22 @@
+fileFormatVersion: 2
+guid: 96814470e2feb9f4e9285700fe26508f
+timeCreated: 1776467408
+licenseType: Free
+AudioImporter:
+  serializedVersion: 6
+  defaultSettings:
+    loadType: 0
+    sampleRateSetting: 0
+    sampleRateOverride: 44100
+    compressionFormat: 1
+    quality: 1
+    conversionMode: 0
+  platformSettingOverrides: {}
+  forceToMono: 0
+  normalize: 1
+  preloadAudioData: 1
+  loadInBackground: 0
+  3D: 1
+  userData: 
+  assetBundleName: teamgamemode
+  assetBundleVariant: tgm

@@ -79,8 +79,8 @@ public class TGM_Button : MonoBehaviour
         Transform spawn = TGM_Scene.GetTeamSpawnRoomTransform(iff);
 
         //Teleport to team spawn room
+        Instantiate(TGM_ModLoader.tgmAssets.classMenu, spawn.position + (Vector3.up * 1.25f) + (spawn.forward * (spawn.localScale.z / 2)), spawn.rotation);
         Global.TeleportToPoint(Global.GetValidSpawnPoint(spawn));
-        Instantiate(TGM_ModLoader.tgmAssets.classMenu, spawn.position + (Vector3.up * 1.25f), spawn.rotation);
 
         //Set Spawn point to new Spawn Room
         GM.CurrentSceneSettings.DeathResetPoint = TGM_Scene.instance.playerResetPoint;

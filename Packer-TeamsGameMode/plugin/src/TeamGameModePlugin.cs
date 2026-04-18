@@ -13,14 +13,11 @@ namespace TeamsGameMode
     [BepInDependency(AtlasConstants.Guid, AtlasConstants.Version)]
     public partial class TeamGameModePlugin : BaseUnityPlugin
     {
-        public static bool h3mp = false;
-
         private void Awake()
         {
             Logger = base.Logger;
 
             AtlasPlugin.Loaders["teamsgamemode"] = new SandboxLoader();
-            h3mp = Chainloader.PluginInfos.ContainsKey("VIP.TommySoucy.H3MP");
 
 
             //Logger.LogMessage($"Hello, world! Sent from {Id} {Name} {Version}");

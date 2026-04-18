@@ -28,6 +28,7 @@ public class TGM_PlayerClass
     public class ItemSet()
     {
         public string name; //For readiblity
+        public int team = -1;   //What Team this is avalible on, -1 means all
         [Header("Objects")]
         public bool requiredSecondaryPieces = true;
         public bool uniformObjects = false; //If True will only spawn one type of objectID

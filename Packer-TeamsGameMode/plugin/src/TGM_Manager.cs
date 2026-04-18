@@ -13,6 +13,8 @@ public class TGM_Manager : MonoBehaviour
     public static GameStateEnum gameState = GameStateEnum.GamemodeSelect;
     public static List<TGM_Gamemode> gamemodes = new List<TGM_Gamemode>();
 
+    public Sprite[] gamemodeThumbnails;
+
     //public Transform playerSpawnPoint;
     //public TGM_Teams teams;
 
@@ -42,6 +44,10 @@ public class TGM_Manager : MonoBehaviour
     public AudioClip audioTeamWon;
     [Tooltip("Player's Team Lost")]
     public AudioClip audioTeamLost;
+    [Tooltip("An objective has been captured")]
+    public AudioClip audioObjectiveEnemyCaptured;
+    [Tooltip("An objective has been captured")]
+    public AudioClip audioObjectiveFriendlyCaptured;
 
     public delegate void GameStateDelegate();
     public static event GameStateDelegate GameStateEvent;
@@ -104,9 +110,13 @@ public class TGM_Manager : MonoBehaviour
         if (gamemodes == null)
             gamemodes = new List<TGM_Gamemode>();
 
-        TGM_TeamDeathmatch teamDeathmatch = new TGM_TeamDeathmatch("Team Deathmatch", "2 Teams fight to the death", null);
+        TGM_TeamDeathmatch teamDeathmatch = new TGM_TeamDeathmatch("Team Deathmatch", "2 Teams fight to the death", gamemodeThumbnails[0]);
         AddGamemode(teamDeathmatch);
 
+        
+        TGM_Rush rush = new TGM_Rush("Rush", "Attack and Defend", gamemodeThumbnails[1]);
+        AddGamemode(rush);
+        
         GamemodesLoadedEvent?.Invoke();
     }
 
@@ -191,6 +201,9 @@ public class TGM_Manager : MonoBehaviour
         TGM_Team sosigTeam = team[s.GetIFF()];
 
         //Assign to Empty Slot
+
+        //Sosig Death logs are disabled until a system to display ingame is added
+        /*
         for (int i = 0; i < sosigTeam.sosigsData.Count; i++)
         {
             if (sosigTeam.sosigsData[i].sosig == s)
@@ -202,6 +215,7 @@ public class TGM_Manager : MonoBehaviour
                 break;
             }
         }
+        */
     }
 
     //------------------------------------------------------------------------------
@@ -348,6 +362,18 @@ public class TGM_Manager : MonoBehaviour
                 else
                     clip = instance.audioTeamLost;
                 break;
+            case PlayAudioEnum.ObjectiveFriendlyCaptured:
+                if (TGM_Scene.instance.audioObjectiveFriendlyCaptured)
+                    clip = TGM_Scene.instance.audioObjectiveFriendlyCaptured;
+                else
+                    clip = instance.audioObjectiveFriendlyCaptured;
+                break;
+            case PlayAudioEnum.ObjectiveEnemyCaptured:
+                if (TGM_Scene.instance.audioObjectiveEnemyCaptured)
+                    clip = TGM_Scene.instance.audioObjectiveEnemyCaptured;
+                else
+                    clip = instance.audioObjectiveEnemyCaptured;
+                break;
         }
 
         if (pitchVariation)
@@ -373,7 +399,9 @@ public class TGM_Manager : MonoBehaviour
         Point = 4,
         Elimination = 5,
         TeamWon = 6,
-        TeamLost = 7,        
+        TeamLost = 7,
+        ObjectiveFriendlyCaptured = 8,
+        ObjectiveEnemyCaptured = 9,
     }
     #endregion
 

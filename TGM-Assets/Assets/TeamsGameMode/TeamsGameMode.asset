@@ -25,3 +25,5 @@ MonoBehaviour:
   endScreen: {fileID: 114232919354635554, guid: ea43b4f57118c914f9bd42f22e3370f2,
     type: 2}
   iffPrefab: {fileID: 1483131967643206, guid: 47d81c0a2df0d264aab306d2300efa3b, type: 2}
+  rushCapturePointPrefab: {fileID: 1244485027580316, guid: 24164fb66c42aab40ac77a23b7e49e5e,
+    type: 2}
