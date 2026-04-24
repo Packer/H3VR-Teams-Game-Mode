@@ -31,7 +31,7 @@ public class TGM_Scene : MonoBehaviour
     [Header("Spectator")]
     public Transform[] spectatorStaticCameras;
 
-    [Header("Prefab Overwrite")]
+    [Header("Gamemode Prefabs")]
     public GameObject rushCapturePrefab;
 
     [Header("Audio Overwrite")]
@@ -55,6 +55,8 @@ public class TGM_Scene : MonoBehaviour
     public AudioClip audioObjectiveFriendlyCaptured;
     [Tooltip("An objective has been captured by the enemy")]
     public AudioClip audioObjectiveEnemyCaptured;
+    [Tooltip("A capture point or objective is being captured")]
+    public AudioClip audioCapturing;
     [Tooltip("Background Audio that plays, should loop")]
     public AudioClip audioBackground;
 

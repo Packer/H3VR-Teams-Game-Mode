@@ -24,13 +24,19 @@ public class TGM_SosigTeam
         public int minKills = -1;
         public int maxKills = -1;
 
-        [Tooltip("SosigEnemyID list, add duplicate IDs to weight them more likely to be picked")]
-        public int[] sosigEnemyIDs;
+        //[Tooltip("SosigEnemyID list, add duplicate IDs to weight them more likely to be picked")]
+        //public int[] sosigEnemyIDs;
+        [Tooltip("SosigEnemyID list for the RED Team, add duplicate IDs to weight them more likely to be picked")]
+        public int[] sosigEnemyIDsRed;
+        [Tooltip("SosigEnemyID list for the BLUE Team, add duplicate IDs to weight them more likely to be picked")]
+        public int[] sosigEnemyIDsBlue;
 
+        /*
         public int GetRandomSosigEnemyID()
         {
             return sosigEnemyIDs[Random.Range(0, sosigEnemyIDs.Length)];
         }
+        */
     }
 
 }

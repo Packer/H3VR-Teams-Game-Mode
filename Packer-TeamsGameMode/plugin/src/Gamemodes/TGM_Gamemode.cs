@@ -272,6 +272,9 @@ public class TGM_Gamemode
     public virtual void OnPlayerKilled(bool killedSelf, int iff)
     {
         TeamGameModePlugin.Logger.LogDebug("Gamemode: OnPlayerKilled");
+
+        //Update Class Menu
+        TGM_ClassMenu.instance.Setup(TGM_Manager.instance.team[GM.CurrentPlayerBody.GetPlayerIFF()].GetPlayerTeam().playerClasses);
     }
 
     /// <summary>

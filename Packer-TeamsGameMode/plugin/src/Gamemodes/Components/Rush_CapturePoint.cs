@@ -19,6 +19,8 @@ public class Rush_CapturePoint : MonoBehaviour
 
     private int handCount = 0;
     private List<Sosig> sosigCount = new List<Sosig>();
+    public AudioSource audioSource;
+    public Vector2 audioPitchRange = new Vector2(0.75f, 1.25f);
 
 
     void OnEnabled()
@@ -31,6 +33,11 @@ public class Rush_CapturePoint : MonoBehaviour
 
         if (spawnedPrefab != null)
             Destroy(spawnedPrefab);
+
+        audioSource.loop = true;
+        audioSource.clip = TGM_Scene.instance.audioCapturing != null ? TGM_Scene.instance.audioCapturing : TGM_Manager.instance.audioCapturing;
+        audioSource.volume = 0;
+        audioSource.Stop();
     }
 
     void Update()
@@ -40,8 +47,22 @@ public class Rush_CapturePoint : MonoBehaviour
 
         if (captureTime != 0)
         {
+            captureCircle.gameObject.SetActive(true);
+
             captureCircle.transform.parent.LookAt(GM.CurrentPlayerBody.Head.position);
             captureCircle.fillAmount = Mathf.InverseLerp(0, captureTotalTime, captureTime);
+
+            if(!audioSource.isPlaying)
+                audioSource.Play();
+
+            audioSource.volume = captureCircle.fillAmount;
+            audioSource.pitch = Mathf.Lerp(audioPitchRange.x, audioPitchRange.y, audioSource.volume);
+        }
+        else
+        {
+            captureCircle.gameObject.SetActive(false);
+            if (audioSource.isPlaying)
+                audioSource.Stop();
         }
 
         if (!IsCapturing())
@@ -49,14 +70,12 @@ public class Rush_CapturePoint : MonoBehaviour
             if (captureTime != 0)
             {
                 captureTime = Mathf.Clamp(captureTime - (Time.deltaTime * 2), 0, captureTotalTime);
-                captureCircle.gameObject.SetActive(false);
                 return;
             }
         }
         else
         {
             //Capturing
-            captureCircle.gameObject.SetActive(true);
             captureTime = Mathf.Clamp(captureTime + Time.deltaTime, 0, captureTotalTime);
             if (captureTime >= captureTotalTime)
             {

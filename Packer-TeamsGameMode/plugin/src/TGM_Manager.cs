@@ -49,6 +49,8 @@ public class TGM_Manager : MonoBehaviour
     public AudioClip audioObjectiveEnemyCaptured;
     [Tooltip("An objective has been captured")]
     public AudioClip audioObjectiveFriendlyCaptured;
+    [Tooltip("A capture point or objective is being captured")]
+    public AudioClip audioCapturing;
 
     public delegate void GameStateDelegate();
     public static event GameStateDelegate GameStateEvent;

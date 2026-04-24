@@ -21,7 +21,5 @@ namespace TeamsGameMode
         public TGM_EndScreen endScreen;
 
         public GameObject iffPrefab;
-
-        public GameObject rushCapturePointPrefab;
     }
 }

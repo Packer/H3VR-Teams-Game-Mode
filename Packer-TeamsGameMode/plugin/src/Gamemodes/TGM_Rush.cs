@@ -76,7 +76,7 @@ public class TGM_Rush : TGM_Gamemode
         {
             if (TGM_Scene.instance.areas[i].iff == blueIFF)
             {
-                GameObject prefab = TGM_Scene.instance.rushCapturePrefab != null ? TGM_Scene.instance.rushCapturePrefab : TGM_ModLoader.tgmAssets.rushCapturePointPrefab;
+                GameObject prefab = TGM_Scene.instance.rushCapturePrefab;
 
                 Rush_CapturePoint capturePoint = TGM_Manager.Instantiate(
                     prefab,
@@ -122,6 +122,10 @@ public class TGM_Rush : TGM_Gamemode
     {
         TeamGameModePlugin.Logger.LogMessage(PluginInfo.NAME + "Set Gamemode " + name + " to " + true);
 
+        //Do we have a prefab for Rush Radios
+        if (TGM_Scene.instance.rushCapturePrefab == null)
+            return false;
+
         //If any area does not have an objective we can
         for (int i = 0; i < TGM_Scene.instance.areas.Length; i++)
         {
@@ -149,12 +153,11 @@ public class TGM_Rush : TGM_Gamemode
                 TGM_Manager.instance.team[blueIFF].Respawn();
                 TGM_Manager.instance.team[blueIFF].respawnTime = Time.time + TGM_Scene.instance.teams[blueIFF].teamSpawnTime;
             }
-        }            
+        }
 
         //Only update during gameplay
         if (TGM_Manager.gameState != TGM_Manager.GameStateEnum.Gameplay)
             return;
-
 
         //If hit our Timelimit
         if (TGM_Settings.GetSetting(TGMSettingEnum.TimeLimit) > 0)

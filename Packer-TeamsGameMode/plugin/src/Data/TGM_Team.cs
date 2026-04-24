@@ -127,11 +127,19 @@ public class TGM_Team
 
             for (int i = 0; i < selectedSosigTeam.sosigSet.Length; i++)
             {
-                if (currentKills >= selectedSosigTeam.sosigSet[i].minKills
-                    && currentKills <= selectedSosigTeam.sosigSet[i].maxKills)
-                {
+                bool maxKills = false;
+                if (selectedSosigTeam.sosigSet[i].maxKills == -1 
+                    || currentKills <= selectedSosigTeam.sosigSet[i].maxKills)
+                    maxKills = true;
+
+                bool minKills = false;
+                if (selectedSosigTeam.sosigSet[i].minKills == -1 
+                    || currentKills >= selectedSosigTeam.sosigSet[i].minKills)
+                    minKills = true;
+
+                //In Range
+                if (minKills && maxKills)
                     sets.Add(selectedSosigTeam.sosigSet[i]);
-                }
             }
 
             //Backup make sure we have at least ONE sosig set
@@ -139,7 +147,12 @@ public class TGM_Team
                 sets.Add(selectedSosigTeam.sosigSet[0]);
 
             TGM_SosigTeam.SosigSet selectedSet = sets[Random.Range(0, sets.Count)];
-            sosigID = selectedSet.sosigEnemyIDs[Random.Range(0, selectedSet.sosigEnemyIDs.Length)];
+
+            //Team specific Sosigs
+            if (spawnOptions.IFF == TGM_Gamemode.redIFF)
+                sosigID = selectedSet.sosigEnemyIDsRed[Random.Range(0, selectedSet.sosigEnemyIDsRed.Length)];
+            else
+                sosigID = selectedSet.sosigEnemyIDsBlue[Random.Range(0, selectedSet.sosigEnemyIDsBlue.Length)];
         }
 
         Sosig sosig =
@@ -200,10 +213,25 @@ public class TGM_Team
         {
             sosigs[i].DestroyAllHeldObjects();
 
+            //Clear Hands
             for (int h = 0; h < sosigs[i].Hands.Count; h++)
             {
                 sosigs[i].Hands[h].DropHeldObject();
+                sosigs[i].Hands[h].HeldObject = null;
             }
+
+            //Clear Slots
+            for (int x = 0; i < sosigs[i].Inventory.Slots.Count; i++)
+            {
+                if (sosigs[i].Inventory.Slots[x] != null)
+                {
+                    sosigs[i].Inventory.Slots[x].DetachHeldObject();
+                    sosigs[i].Inventory.Slots[x].IsHoldingObject = false;
+                }
+            }
+
+            //FLEE, FLEE FOR YOUR LIVES
+            sosigs[i].CurrentOrder = Sosig.SosigOrder.Flee;
         }
     }
 

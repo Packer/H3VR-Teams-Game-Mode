@@ -309,3 +309,4 @@ MonoBehaviour:
     type: 3}
   audioObjectiveFriendlyCaptured: {fileID: 8300000, guid: 1c133bfc52e060142807424337c101b7,
     type: 3}
+  audioCapturing: {fileID: 8300000, guid: 411107ef7ea726c4ea8def18079a15e4, type: 3}

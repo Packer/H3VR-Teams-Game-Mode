@@ -627,11 +627,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   teams:
   - respawnArea: {fileID: 0}
-    teamMenu: {fileID: 0}
     startSpawnArea: {fileID: 1325673442}
     teamSpawnTime: 5
   - respawnArea: {fileID: 0}
-    teamMenu: {fileID: 0}
     startSpawnArea: {fileID: 0}
     teamSpawnTime: 5
   areas:
@@ -657,6 +655,7 @@ MonoBehaviour:
   audioTeamLost: {fileID: 0}
   audioObjectiveFriendlyCaptured: {fileID: 0}
   audioObjectiveEnemyCaptured: {fileID: 0}
+  audioCapturing: {fileID: 0}
   audioBackground: {fileID: 0}
 --- !u!4 &297024890
 Transform:
@@ -2724,7 +2723,7 @@ MonoBehaviour:
   iff: 0
   capturePoint: {fileID: 706550843}
   objective: {fileID: 2095327091}
-  objectiveTime: 14
+  captureTime: 20
   spawnPoints:
   - name: 
     playerSpawnPoints: []

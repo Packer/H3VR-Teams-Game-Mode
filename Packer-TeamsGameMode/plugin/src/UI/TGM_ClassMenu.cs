@@ -67,13 +67,37 @@ public class TGM_ClassMenu : MonoBehaviour
 
     public void Setup(TGM_PlayerClass[] classes)
     {
+        ClearButtons();
+
+        int iff = GM.CurrentPlayerBody.GetPlayerIFF();
+
+        //Spectator some how
+        if (iff != 0 && iff != 1)
+            return;
+
+        int currentKills = TGM_Manager.instance.team[iff].currentKills;
+
         for (int i = 0; i < classes.Length; i++)
         {
+            bool maxKills = false;
+            if (classes[i].maxKills == -1
+                || currentKills <= classes[i].maxKills)
+                maxKills = true;
+
+            bool minKills = false;
+            if (classes[i].minKills == -1
+                || currentKills >= classes[i].minKills)
+                minKills = true;
+
+            if (!minKills || !maxKills)
+                continue;
+
             TGM_Button button = Instantiate(buttonPrefab, buttonContent).GetComponent<TGM_Button>();
             button.gameObject.SetActive(true);
             button.texts[0].text = classes[i].name;
             button.buttons[0].image.sprite = classes[i].thumbnail;
             button.index = i;
+
             buttons.Add(button);
         }
     }
@@ -82,7 +106,8 @@ public class TGM_ClassMenu : MonoBehaviour
     {
         for (int i = 0; i < buttons.Count; i++)
         {
-            Destroy(buttons[i].gameObject);
+            if(buttons[i] != null)
+                Destroy(buttons[i].gameObject);
         }
         buttons.Clear();
     }
@@ -104,6 +129,20 @@ public class TGM_ClassMenu : MonoBehaviour
 
     public void LeaveTeam()
     {
+        //Destroy ally markers on leaving teamc
+        for (int x = 0; x < TGM_Manager.instance.team.Length; x++)
+        {
+            for (int y = 0; y < TGM_Manager.instance.team[x].sosigsData.Count; y++)
+            {
+                if (TGM_Manager.instance.team[x].sosigsData != null
+                    && TGM_Manager.instance.team[x].sosigsData[y].allyMarker != null)
+                {
+                    Destroy(TGM_Manager.instance.team[x].sosigsData[y].allyMarker);
+                    TGM_Manager.instance.team[x].sosigsData[y].allyMarker = null;
+                }
+            }
+        }
+
         TGM_Manager.PlayAudio(TGM_Manager.PlayAudioEnum.Confirm);
         TGM_Manager.LeaveTeam();
     }
@@ -279,7 +318,7 @@ public class TGM_ClassMenu : MonoBehaviour
                                 //Spawn raw round
                                 spawnCartridge = Global.SpawnFVRObject(
                                     fvrCartridge,
-                                    instance.ammoSpawns[spawnMainIndex].position + (Vector3.up * 0.05f * c) + (Vector3.right * 0.025f * c),
+                                    instance.ammoSpawns[spawnMainIndex].position + (Vector3.up * 0.05f * c) + (-Vector3.right * 0.025f * c),
                                     instance.ammoSpawns[spawnMainIndex].rotation.eulerAngles);
 
                                 if (spawnCartridge != null)
