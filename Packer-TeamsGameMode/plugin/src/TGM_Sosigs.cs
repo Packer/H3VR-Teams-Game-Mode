@@ -37,7 +37,6 @@ public class TGM_Sosigs
         locations.RemoveAt(2);
         List<Vector3> pathPoints = locations;
 
-
         sosig.CommandPathTo(
             pathPoints,
             pathDirs,
@@ -51,5 +50,8 @@ public class TGM_Sosigs
             1f,
             true,
             50f);
+
+        sosig.UpdateAssaultPoint(pathPoints[0]);
+        sosig.SetCurrentOrder(Sosig.SosigOrder.Assault);
     }
 }

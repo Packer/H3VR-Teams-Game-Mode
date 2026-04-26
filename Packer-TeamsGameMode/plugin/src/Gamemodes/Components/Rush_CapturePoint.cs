@@ -15,7 +15,8 @@ public class Rush_CapturePoint : MonoBehaviour
     private float captureTime = 0;
     public Image captureCircle;
     public GameObject capturedPrefab;
-    private GameObject spawnedPrefab;
+    [HideInInspector]
+    public GameObject spawnedPrefab;
 
     private int handCount = 0;
     private List<Sosig> sosigCount = new List<Sosig>();
@@ -43,7 +44,14 @@ public class Rush_CapturePoint : MonoBehaviour
     void Update()
     {
         if (!canCapture)
+        {
+            if(captureCircle.gameObject.activeSelf)
+                captureCircle.gameObject.SetActive(false);
+            if (audioSource.isPlaying)
+                audioSource.Stop();
             return;
+        }
+        
 
         if (captureTime != 0)
         {
@@ -117,6 +125,9 @@ public class Rush_CapturePoint : MonoBehaviour
 
     bool IsCapturing()
     {
+        if (TGM_Manager.gameState != TGM_Manager.GameStateEnum.Gameplay)
+            return false;
+
         for (int i = sosigCount.Count - 1; i >= 0; i--)
         {
             if (sosigCount[i] != null)

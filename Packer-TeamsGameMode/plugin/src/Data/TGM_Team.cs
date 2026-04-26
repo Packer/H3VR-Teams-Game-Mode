@@ -35,6 +35,7 @@ public class TGM_Team
     public float respawnTime = 0;
 
     private int spawnIndex = 0;
+    private int spawnOrderIndex = 0;
 
     public TGM_PlayerTeam GetPlayerTeam()
     {
@@ -146,13 +147,37 @@ public class TGM_Team
             if (sets.Count <= 0)
                 sets.Add(selectedSosigTeam.sosigSet[0]);
 
-            TGM_SosigTeam.SosigSet selectedSet = sets[Random.Range(0, sets.Count)];
+            if (selectedSosigTeam.spawnInOrder)
+            {
+                //ORDERED
+                List<int> idList = new List<int>();
+                for (int i = 0; i < sets.Count; i++)
+                {
+                    int[] team = spawnOptions.IFF == TGM_Gamemode.redIFF ? sets[i].sosigEnemyIDsRed : sets[i].sosigEnemyIDsBlue;
 
-            //Team specific Sosigs
-            if (spawnOptions.IFF == TGM_Gamemode.redIFF)
-                sosigID = selectedSet.sosigEnemyIDsRed[Random.Range(0, selectedSet.sosigEnemyIDsRed.Length)];
+                    for (int x = 0; x < team.Length; x++)
+                    {
+                        idList.Add(team[x]);
+                    }
+                }
+
+                spawnOrderIndex++;
+                if (spawnOrderIndex >= idList.Count)
+                    spawnOrderIndex = 0;
+
+                sosigID = idList[spawnOrderIndex];
+            }
             else
-                sosigID = selectedSet.sosigEnemyIDsBlue[Random.Range(0, selectedSet.sosigEnemyIDsBlue.Length)];
+            {
+                //RANDOM
+                TGM_SosigTeam.SosigSet selectedSet = sets[Random.Range(0, sets.Count)];
+
+                //Team specific Sosigs
+                if (spawnOptions.IFF == TGM_Gamemode.redIFF)
+                    sosigID = selectedSet.sosigEnemyIDsRed[Random.Range(0, selectedSet.sosigEnemyIDsRed.Length)];
+                else
+                    sosigID = selectedSet.sosigEnemyIDsBlue[Random.Range(0, selectedSet.sosigEnemyIDsBlue.Length)];
+            }
         }
 
         Sosig sosig =
@@ -166,6 +191,7 @@ public class TGM_Team
         sosig.SetAssaultSpeed(Sosig.SosigMoveSpeed.Running);
         sosig.FallbackOrder = Sosig.SosigOrder.Assault;
         sosig.CommandAssaultPoint(spawnOptions.SosigTargetPosition);
+        sosig.MoveSpeed = Sosig.SosigMoveSpeed.Running;
 
         //Assign to Empty Slot
         int sosigDataIndex = 0;
@@ -216,11 +242,17 @@ public class TGM_Team
         //Thats it, everyone has their weapons taken away
         for (int i = 0; i < sosigs.Count; i++)
         {
+            if (sosigs[i] == null)
+                continue;
+
             sosigs[i].DestroyAllHeldObjects();
 
             //Clear Hands
             for (int h = 0; h < sosigs[i].Hands.Count; h++)
             {
+                if (sosigs[i].Hands[h] == null)
+                    continue;
+
                 sosigs[i].Hands[h].DropHeldObject();
                 sosigs[i].Hands[h].HeldObject = null;
             }

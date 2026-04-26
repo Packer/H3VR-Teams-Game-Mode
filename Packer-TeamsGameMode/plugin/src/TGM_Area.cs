@@ -75,7 +75,7 @@ public class TGM_Area : MonoBehaviour
         for (int i = 0; i < neutralObjects.Length; i++)
         {
             if (neutralObjects[i] != null)
-                neutralObjects[i].SetActive(iff != playerIFF && iff != enemyIFF);
+                neutralObjects[i].SetActive(iff < 0);
         }
 
         //Owned By Red Team
@@ -116,6 +116,10 @@ public class TGM_Area : MonoBehaviour
     /// <returns></returns>
     public List<Vector3> GetRandomAttackArea()
     {
+        //Error backup
+        if (iff < 0)
+            return GetObjectiveArea();
+
         Transform area = spawnPoints[iff].sosigAttackAreas[Random.Range(0, spawnPoints[iff].sosigAttackAreas.Length)];
         //Transform area = spawnPoints[].sosigAttackAreas[Random.Range(0, sosigAttackAreas.Length)];
         return GetRandomAreaPositions(area);
@@ -124,7 +128,11 @@ public class TGM_Area : MonoBehaviour
     //TODO THIS NEEDS TO BE RELATIVE TO WHAT TEAM IS REQUESTING THIS DATA
     public List<Vector3> GetRandomDefendArea()
     {
-        Transform area = spawnPoints[iff].sosigDefendAreas[Random.Range(0, spawnPoints[iff].sosigAttackAreas.Length)];
+        //Error backup
+        if (iff < 0)
+            return GetObjectiveArea();
+        
+        Transform area = spawnPoints[iff].sosigDefendAreas[Random.Range(0, spawnPoints[iff].sosigDefendAreas.Length)];
         return GetRandomAreaPositions(area);
     }
     public List<Vector3> GetObjectiveArea()

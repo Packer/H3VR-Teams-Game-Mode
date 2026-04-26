@@ -58,10 +58,17 @@ public class TGM_Spectator : MonoBehaviour
         if (target == null)
             return;
 
+        if(Input.GetKeyDown(KeyCode.RightArrow))
+            GetNextTarget(1);
+        if (Input.GetKeyDown(KeyCode.LeftArrow))
+            GetNextTarget(-1);
+
         Vector3 targetHead = target.position + (Vector3.up * 1.5f);
         Vector3 targetBehind = target.position + (Vector3.up * 1.5f) + (-target.forward * 2);
 
-        if (Physics.Linecast(targetHead, targetBehind, out hit, mask))
+        if (TGM_MainMenu.instance.spectateName.text == "")
+            spectatorCamera.transform.position = targetBehind;
+        else if (Physics.Linecast(targetHead, targetBehind, out hit, mask))
             spectatorCamera.transform.position = Vector3.Slerp(spectatorCamera.transform.position, hit.point, Time.deltaTime);
         else
             spectatorCamera.transform.position = Vector3.Slerp(spectatorCamera.transform.position, targetBehind, Time.deltaTime);
@@ -119,6 +126,7 @@ public class TGM_Spectator : MonoBehaviour
             if (TGM_Scene.instance.spectatorStaticCameras[index] != null)
             {
                 TGM_MainMenu.instance.spectateName.text = "";
+
                 return TGM_Scene.instance.spectatorStaticCameras[index];
             }
             else

@@ -305,6 +305,7 @@ MonoBehaviour:
   audioElimination: {fileID: 8300000, guid: 040457098d94e66408b4b3ff0677fe91, type: 3}
   audioTeamWon: {fileID: 8300000, guid: b8310e55114bf1540a257f6f3e51c72e, type: 3}
   audioTeamLost: {fileID: 8300000, guid: 23fdffe8715af4c41aa87a29f79311a6, type: 3}
+  audioTeamDraw: {fileID: 8300000, guid: 23fdffe8715af4c41aa87a29f79311a6, type: 3}
   audioObjectiveEnemyCaptured: {fileID: 8300000, guid: 96814470e2feb9f4e9285700fe26508f,
     type: 3}
   audioObjectiveFriendlyCaptured: {fileID: 8300000, guid: 1c133bfc52e060142807424337c101b7,

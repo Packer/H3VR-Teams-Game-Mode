@@ -1026,7 +1026,7 @@ GameObject:
   - component: {fileID: 222136551467890618}
   - component: {fileID: 114038670702597854}
   m_Layer: 10
-  m_Name: Objective
+  m_Name: RED_Objective
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1061,7 +1061,7 @@ GameObject:
   - component: {fileID: 222315256475426868}
   - component: {fileID: 114391766908546476}
   m_Layer: 10
-  m_Name: Objective
+  m_Name: Blue_Objective
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -5776,6 +5776,9 @@ MonoBehaviour:
   sosigTeamDescriptions:
   - {fileID: 114381615010222948}
   - {fileID: 114763582539868804}
+  teamObjectiveAdjust:
+  - {fileID: 1420357559827664}
+  - {fileID: 1430903738009104}
 --- !u!114 &114561222921754112
 MonoBehaviour:
   m_ObjectHideFlags: 1

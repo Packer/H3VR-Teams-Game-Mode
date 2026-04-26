@@ -51,6 +51,8 @@ public class TGM_Scene : MonoBehaviour
     public AudioClip audioTeamWon;
     [Tooltip("Player's Team Lost")]
     public AudioClip audioTeamLost;
+    [Tooltip("Both Teams Draw")]
+    public AudioClip audioTeamDraw;
     [Tooltip("An objective has been captured by a friendly")]
     public AudioClip audioObjectiveFriendlyCaptured;
     [Tooltip("An objective has been captured by the enemy")]

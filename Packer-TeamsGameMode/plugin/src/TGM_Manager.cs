@@ -45,6 +45,8 @@ public class TGM_Manager : MonoBehaviour
     public AudioClip audioTeamWon;
     [Tooltip("Player's Team Lost")]
     public AudioClip audioTeamLost;
+    [Tooltip("Both Teams Draw")]
+    public AudioClip audioTeamDraw;
     [Tooltip("An objective has been captured")]
     public AudioClip audioObjectiveEnemyCaptured;
     [Tooltip("An objective has been captured")]
@@ -127,10 +129,11 @@ public class TGM_Manager : MonoBehaviour
 
     void Update()
     {
-        if (gameState == GameStateEnum.Gameplay)
-        {
+        if(gamemode != null)
             gamemode.Update();
 
+        if (gameState == GameStateEnum.Gameplay)
+        {
             //Catch any Sosigs that have fallen out of the map
             if (Time.time >= safteyCheck)
             {
@@ -428,6 +431,12 @@ public class TGM_Manager : MonoBehaviour
                 else
                     clip = instance.audioObjectiveEnemyCaptured;
                 break;
+            case PlayAudioEnum.TeamDraw:
+                if (TGM_Scene.instance.audioTeamDraw)
+                    clip = TGM_Scene.instance.audioTeamDraw;
+                else
+                    clip = instance.audioTeamDraw;
+                break;
         }
 
         if (pitchVariation)
@@ -463,6 +472,7 @@ public class TGM_Manager : MonoBehaviour
         TeamLost = 7,
         ObjectiveFriendlyCaptured = 8,
         ObjectiveEnemyCaptured = 9,
+        TeamDraw = 10,
     }
     #endregion
 

@@ -653,6 +653,7 @@ MonoBehaviour:
   audioElimination: {fileID: 0}
   audioTeamWon: {fileID: 0}
   audioTeamLost: {fileID: 0}
+  audioTeamDraw: {fileID: 0}
   audioObjectiveFriendlyCaptured: {fileID: 0}
   audioObjectiveEnemyCaptured: {fileID: 0}
   audioCapturing: {fileID: 0}

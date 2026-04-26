@@ -16,6 +16,8 @@ public class TGM_SosigTeam
     public string description = "A short description of this sosig faction";
     [Tooltip("Preview image of the team when selected")]
     public Sprite thumbnail;
+    [Tooltip("Do Sosigs spawn in a linear order")]
+    public bool spawnInOrder = false;
     public SosigSet[] sosigSet;
 
     [Serializable]

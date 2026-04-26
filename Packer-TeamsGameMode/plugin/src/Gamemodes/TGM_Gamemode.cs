@@ -184,18 +184,24 @@ public class TGM_Gamemode
         if (TGM_Manager.gameState != TGM_Manager.GameStateEnum.Gameplay)
             return;
 
-        float remainTime = Time.time - TGM_Manager.instance.startTime;
-        TimeSpan time = TimeSpan.FromSeconds(remainTime);
+        TimeSpan time;
 
-        TGM_Compass.instance.gameTimeText.text = time.Minutes + ":" + (time.Seconds < 10 ? "0" + time.Seconds : time.Seconds);
-
-        //If hit our custom Timelimit
+        //TIME LIMIT
         if (TGM_Settings.GetSetting(TGMSettingEnum.TimeLimit) > 0)
         {
-            winIFF = -1;    //Default to Draw
-            if (remainTime >= TGM_Settings.GetSetting(TGMSettingEnum.TimeLimit))
-                TGM_Manager.instance.SetGameState(TGM_Manager.GameStateEnum.Postgame);
+            //How long a round is
+            float goal = TGM_Settings.GetSetting(TGMSettingEnum.TimeLimit);
+            float playTime = Time.time - TGM_Manager.instance.startTime;
+
+            float remainTime = (TGM_Manager.instance.startTime + goal) - playTime;
+            time = TimeSpan.FromSeconds(remainTime);
         }
+        else   //INFINITE
+        {
+            float remainTime = Time.time - TGM_Manager.instance.startTime;
+            time = TimeSpan.FromSeconds(remainTime);
+        }
+        TGM_Compass.instance.gameTimeText.text = time.Minutes + ":" + (time.Seconds < 10 ? "0" + time.Seconds : time.Seconds);
     }
 
     /// <summary>

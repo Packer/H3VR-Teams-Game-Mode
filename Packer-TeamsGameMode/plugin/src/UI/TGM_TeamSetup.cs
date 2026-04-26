@@ -29,6 +29,7 @@ public class TGM_TeamSetup : MonoBehaviour
     public Text[] sosigTeamTitles;
     public Text[] playerTeamDescriptions;
     public Text[] sosigTeamDescriptions;
+    public GameObject[] teamObjectiveAdjust;
 
     void Awake()
     {

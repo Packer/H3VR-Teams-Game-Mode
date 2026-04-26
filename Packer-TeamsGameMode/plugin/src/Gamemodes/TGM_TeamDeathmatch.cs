@@ -51,8 +51,10 @@ public class TGM_TeamDeathmatch : TGM_Gamemode
         base.Postgame();
 
         int localIFF = GM.CurrentPlayerBody.GetPlayerIFF();
-
-        if (localIFF == winIFF || localIFF < 0)
+        
+        if (winIFF == -1)
+            TGM_Manager.PlayAudio(TGM_Manager.PlayAudioEnum.TeamDraw);
+        else if (localIFF == winIFF || localIFF < 0)
             TGM_Manager.PlayAudio(TGM_Manager.PlayAudioEnum.TeamWon);
         else
             TGM_Manager.PlayAudio(TGM_Manager.PlayAudioEnum.TeamLost);
@@ -94,7 +96,16 @@ public class TGM_TeamDeathmatch : TGM_Gamemode
                 TGM_Manager.instance.SetGameState(TGM_Manager.GameStateEnum.Postgame);
                 return;
             }
-        }    
+        }
+
+        //If hit our custom Timelimit
+        if (TGM_Settings.GetSetting(TGMSettingEnum.TimeLimit) > 0)
+        {
+            winIFF = -1;    //Default to Draw
+            float remainTime = Time.time - TGM_Manager.instance.startTime;
+            if (remainTime >= TGM_Settings.GetSetting(TGMSettingEnum.TimeLimit))
+                TGM_Manager.instance.SetGameState(TGM_Manager.GameStateEnum.Postgame);
+        }
     }
 
     public override void OnPlayerKilled(bool killedSelf, int iff)

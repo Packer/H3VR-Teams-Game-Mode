@@ -48,11 +48,16 @@ public class TGM_EndScreen : MonoBehaviour
 
         //Winner
         if (TGM_Manager.instance.gamemode.winIFF == -1)
+        {
             resultText.text = "DRAW";
+            resultBackground.color = Color.grey;
+        }
         else
+        {
             resultText.text = TGM_Manager.instance.gamemode.winIFF == GM.CurrentPlayerBody.GetPlayerIFF() ? "VICTORY" : "DEFEAT";
+            resultBackground.color = TGM_Manager.instance.team[TGM_Manager.instance.gamemode.winIFF].color;
+        }
 
-        resultBackground.color = TGM_Manager.instance.team[TGM_Manager.instance.gamemode.winIFF].color;
         teamPanels[0].color = TGM_Manager.instance.team[0].color;
         teamPanels[1].color = TGM_Manager.instance.team[1].color;
         teamNames[0].text = TGM_Manager.instance.team[0].teamName;
