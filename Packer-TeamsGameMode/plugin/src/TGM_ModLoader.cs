@@ -66,7 +66,7 @@ public class TGM_ModLoader
 
         //--------------------------------------------------------------------------------------------------------
 
-        yield return TGM_Scene.instance.StartCoroutine(LoadInAssets());
+        //yield return TGM_Scene.instance.StartCoroutine(LoadInAssets());
         assetsLoading = false;
 
         yield return TGM_Scene.instance.StartCoroutine(SetupGameData());

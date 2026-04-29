@@ -25,7 +25,7 @@ public class TGM_Rush : TGM_Gamemode
     {
         base.LoadDefaultProfile();
         //Do Gamemode Settings here
-        TGM_Settings.SetSetting(TGMSettingEnum.TimeLimit, 480);
+        TGM_Settings.SetSetting(TGMSettingEnum.TimeLimit, 720);
     }
 
     public override void Setup()
@@ -308,6 +308,14 @@ public class TGM_Rush : TGM_Gamemode
         {
             //Defenders
             TGM_Sosigs.OrderSosigToLocations(s, TGM_Manager.instance.team[iff].currentSpawnArea.GetRandomDefendArea());
+
+            //If in pregame, get sosigs to GUARD their positions
+            if (TGM_Manager.gameState == TGM_Manager.GameStateEnum.Pregame)
+            {
+                s.CurrentOrder = Sosig.SosigOrder.GuardPoint;
+                s.FallbackOrder = Sosig.SosigOrder.GuardPoint;
+                s.SetCurrentOrder(Sosig.SosigOrder.GuardPoint);
+            }
         }
         else
         {

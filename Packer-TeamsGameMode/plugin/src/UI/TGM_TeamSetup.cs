@@ -41,6 +41,12 @@ public class TGM_TeamSetup : MonoBehaviour
         //Setup Default Spawn points
         for (int i = 0; i < TGM_Manager.instance.team.Length; i++)
         {
+            if (TGM_Scene.instance.teams[i].startSpawnArea == null)
+            {
+                TeamGameModePlugin.Logger.LogError("Map is Missing team " + i + " startSpawnArea !!!");
+                continue;
+            }
+
             TGM_Manager.instance.team[i].currentSpawnArea = TGM_Scene.instance.teams[i].startSpawnArea;
         }
 

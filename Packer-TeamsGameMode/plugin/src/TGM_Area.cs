@@ -46,6 +46,8 @@ public class TGM_Area : MonoBehaviour
         [Header("Sosigs")]
         [Tooltip("Area where sosigs can spawn, can be scaled")]
         public Transform[] sosigSpawnPoints;
+        [Tooltip("Area where vehicle or large sosigs can spawn, can be scaled")]
+        public Transform[] sosigVehicleSpawnPoints;
         [Tooltip("Areas sosigs will navigate to when owned by enemies to find enemies")]
         public Transform[] sosigAttackAreas;
         [Tooltip("Defined areas sosigs will defend this Area")]
@@ -118,7 +120,10 @@ public class TGM_Area : MonoBehaviour
     {
         //Error backup
         if (iff < 0)
+        {
+            TeamGameModePlugin.Logger.LogWarning("Wrong Attack IFF, defaulting to Objective");
             return GetObjectiveArea();
+        }
 
         Transform area = spawnPoints[iff].sosigAttackAreas[Random.Range(0, spawnPoints[iff].sosigAttackAreas.Length)];
         //Transform area = spawnPoints[].sosigAttackAreas[Random.Range(0, sosigAttackAreas.Length)];
@@ -130,7 +135,10 @@ public class TGM_Area : MonoBehaviour
     {
         //Error backup
         if (iff < 0)
+        {
+            TeamGameModePlugin.Logger.LogWarning("Wrong Defend IFF, defaulting to Objective");
             return GetObjectiveArea();
+        }
         
         Transform area = spawnPoints[iff].sosigDefendAreas[Random.Range(0, spawnPoints[iff].sosigDefendAreas.Length)];
         return GetRandomAreaPositions(area);
@@ -165,12 +173,6 @@ public class TGM_Area : MonoBehaviour
 
     public static Vector3[] attackIcon = {Vector3.up, (Vector3.up * 0.5f) + (Vector3.left * 0.5f), (Vector3.up * 0.5f) + (Vector3.right * 0.5f) };
 
-    public void PlaceAllMarkersOnGround()
-    {
-
-    }
-
-
     void OnDrawGizmos()
     {
         if (objective != null)
@@ -198,7 +200,7 @@ public class TGM_Area : MonoBehaviour
                 Gizmos.color = newGreen;
                 for (int i = 0; i < spawnPoints[s].playerSpawnPoints.Length; i++)
                 {
-                    if (spawnPoints[i] == null)
+                    if (spawnPoints[s].playerSpawnPoints[i] == null)
                         continue;
 
                     Gizmos.DrawCube(spawnPoints[s].playerSpawnPoints[i].position, spawnPoints[s].playerSpawnPoints[i].lossyScale);
@@ -302,6 +304,26 @@ public class TGM_Area : MonoBehaviour
 
         for (int s = 0; s < spawnPoints.Length; s++)
         {
+            if (spawnPoints[s].sosigVehicleSpawnPoints != null)
+            {
+                Color cyan = new Color(1f, 0.75f, 0.25f);
+                cyan.a = 0.2f;
+                Gizmos.color = cyan;
+
+                for (int i = 0; i < spawnPoints[s].sosigVehicleSpawnPoints.Length; i++)
+                {
+                    if (spawnPoints[s].sosigVehicleSpawnPoints[i] == null)
+                        continue;
+
+                    Gizmos.matrix = Matrix4x4.TRS(
+                        spawnPoints[s].sosigVehicleSpawnPoints[i].position,
+                        spawnPoints[s].sosigVehicleSpawnPoints[i].rotation,
+                        spawnPoints[s].sosigVehicleSpawnPoints[i].lossyScale);
+                    Gizmos.DrawCube(Vector3.zero, Vector3.one);
+                    Gizmos.DrawWireCube(Vector3.zero, Vector3.one);
+                }
+            }
+
             if (spawnPoints[s].sosigSpawnPoints != null)
             {
                 Color yellow = new Color(0.999f, 0.5f, 0);

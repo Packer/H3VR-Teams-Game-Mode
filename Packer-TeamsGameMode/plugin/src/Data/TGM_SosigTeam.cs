@@ -25,6 +25,7 @@ public class TGM_SosigTeam
     {
         public int minKills = -1;
         public int maxKills = -1;
+        public bool useVehicleSpawn = false;
 
         //[Tooltip("SosigEnemyID list, add duplicate IDs to weight them more likely to be picked")]
         //public int[] sosigEnemyIDs;

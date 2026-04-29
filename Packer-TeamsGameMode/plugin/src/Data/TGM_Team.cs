@@ -88,11 +88,29 @@ public class TGM_Team
 
             for (int i = 0; i < sosigRemain; i++)
             {
-                Transform spawnArea = currentSpawnArea.spawnPoints[iff].sosigSpawnPoints[Random.Range(0, currentSpawnArea.spawnPoints[iff].sosigSpawnPoints.Length)];
-                
+                SosigSetGroup group = GetSosigID(iff);
+                bool useVehicle = TGM_ModLoader.sosigTeams[sosigTeam].sosigSet[group.set].useVehicleSpawn;
+                Transform spawnArea;
+
+                //Use Vehicle spawns for vehicle sosigs
+                if (useVehicle
+                    && currentSpawnArea.spawnPoints[iff].sosigVehicleSpawnPoints != null 
+                    && currentSpawnArea.spawnPoints[iff].sosigVehicleSpawnPoints.Length >= 0)
+                {
+                    spawnArea = currentSpawnArea.spawnPoints[iff].sosigVehicleSpawnPoints[Random.Range(0, currentSpawnArea.spawnPoints[iff].sosigVehicleSpawnPoints.Length)];
+                }
+                else
+                    spawnArea = currentSpawnArea.spawnPoints[iff].sosigSpawnPoints[Random.Range(0, currentSpawnArea.spawnPoints[iff].sosigSpawnPoints.Length)];
+
                 Vector3 spawnPoint = Global.GetGridXZPositionTransform(spawnArea, spawnIndex, 6);   //6x6 area, 4 bonus spawns
                 //Debug.Log(spawnArea.position + " : " + spawnPoint);
-                Sosig s = CreateTeamSosig(_spawnOptions, spawnPoint, spawnArea.rotation);
+                Sosig s = CreateTeamSosig(_spawnOptions, spawnPoint, spawnArea.rotation, group.id);
+
+                //Vehicle sosig? On the Vehicle navMesh
+                if (useVehicle && TGM_Scene.instance.vehicleNavMesh != null)
+                {
+                    s.Agent.areaMask = NavMesh.GetAreaFromName("Exfil");
+                }
 
                 TGM_Manager.instance.gamemode.OnSosigCreate(s);
 
@@ -106,80 +124,98 @@ public class TGM_Team
         }
     }
 
-    public Sosig CreateTeamSosig(SosigAPI.SpawnOptions spawnOptions, Vector3 position, Quaternion rotation, int sosigID = -2)
+    public class SosigSetGroup
     {
-        //If not custom sosig, use team ID
-        if (sosigID == -2)
+        public int id;
+        public int set;
+    }
+
+    public SosigSetGroup GetSosigID(int iff)
+    {
+        int setID = 0;
+        int sosigID = -2;
+
+        List<TGM_SosigTeam.SosigSet> sets = new List<TGM_SosigTeam.SosigSet>();
+
+        TGM_SosigTeam selectedSosigTeam = TGM_ModLoader.sosigTeams[sosigTeam];
+
+        if (selectedSosigTeam == null)
         {
-            List<TGM_SosigTeam.SosigSet> sets = new List<TGM_SosigTeam.SosigSet>();
-
-            TGM_SosigTeam selectedSosigTeam = TGM_ModLoader.sosigTeams[sosigTeam];
-
-            if (selectedSosigTeam == null)
-            {
-                TeamGameModePlugin.Logger.LogError("MISSING SOSIG TEAM");
-                return null;
-            }
-            if (selectedSosigTeam.sosigSet == null)
-            {
-                TeamGameModePlugin.Logger.LogError("MISSING SOSIG SET");
-                return null;
-            }
-
-            for (int i = 0; i < selectedSosigTeam.sosigSet.Length; i++)
-            {
-                bool maxKills = false;
-                if (selectedSosigTeam.sosigSet[i].maxKills == -1 
-                    || currentKills <= selectedSosigTeam.sosigSet[i].maxKills)
-                    maxKills = true;
-
-                bool minKills = false;
-                if (selectedSosigTeam.sosigSet[i].minKills == -1 
-                    || currentKills >= selectedSosigTeam.sosigSet[i].minKills)
-                    minKills = true;
-
-                //In Range
-                if (minKills && maxKills)
-                    sets.Add(selectedSosigTeam.sosigSet[i]);
-            }
-
-            //Backup make sure we have at least ONE sosig set
-            if (sets.Count <= 0)
-                sets.Add(selectedSosigTeam.sosigSet[0]);
-
-            if (selectedSosigTeam.spawnInOrder)
-            {
-                //ORDERED
-                List<int> idList = new List<int>();
-                for (int i = 0; i < sets.Count; i++)
-                {
-                    int[] team = spawnOptions.IFF == TGM_Gamemode.redIFF ? sets[i].sosigEnemyIDsRed : sets[i].sosigEnemyIDsBlue;
-
-                    for (int x = 0; x < team.Length; x++)
-                    {
-                        idList.Add(team[x]);
-                    }
-                }
-
-                spawnOrderIndex++;
-                if (spawnOrderIndex >= idList.Count)
-                    spawnOrderIndex = 0;
-
-                sosigID = idList[spawnOrderIndex];
-            }
-            else
-            {
-                //RANDOM
-                TGM_SosigTeam.SosigSet selectedSet = sets[Random.Range(0, sets.Count)];
-
-                //Team specific Sosigs
-                if (spawnOptions.IFF == TGM_Gamemode.redIFF)
-                    sosigID = selectedSet.sosigEnemyIDsRed[Random.Range(0, selectedSet.sosigEnemyIDsRed.Length)];
-                else
-                    sosigID = selectedSet.sosigEnemyIDsBlue[Random.Range(0, selectedSet.sosigEnemyIDsBlue.Length)];
-            }
+            TeamGameModePlugin.Logger.LogError("MISSING SOSIG TEAM");
+            return null;
+        }
+        if (selectedSosigTeam.sosigSet == null)
+        {
+            TeamGameModePlugin.Logger.LogError("MISSING SOSIG SET");
+            return null;
         }
 
+        for (int i = 0; i < selectedSosigTeam.sosigSet.Length; i++)
+        {
+            bool maxKills = false;
+            if (selectedSosigTeam.sosigSet[i].maxKills == -1
+                || currentKills <= selectedSosigTeam.sosigSet[i].maxKills)
+                maxKills = true;
+
+            bool minKills = false;
+            if (selectedSosigTeam.sosigSet[i].minKills == -1
+                || currentKills >= selectedSosigTeam.sosigSet[i].minKills)
+                minKills = true;
+
+            //In Range
+            if (minKills && maxKills)
+                sets.Add(selectedSosigTeam.sosigSet[i]);
+        }
+
+        //Error Check - Backup make sure we have at least ONE sosig set
+        if (sets.Count <= 0)
+        {
+            TeamGameModePlugin.Logger.LogWarning("No Valid Sosig Sets found, defaulting to first Sosig Set");
+            sets.Add(selectedSosigTeam.sosigSet[0]);
+        }
+
+        if (selectedSosigTeam.spawnInOrder)
+        {
+            //ORDERED
+            List<int> idList = new List<int>();
+            for (int i = 0; i < sets.Count; i++)
+            {
+                int[] team = iff == TGM_Gamemode.redIFF ? sets[i].sosigEnemyIDsRed : sets[i].sosigEnemyIDsBlue;
+
+                idList.AddRange(team);
+                if (idList.Count >= spawnOrderIndex)
+                {
+                    setID = i;
+                }
+            }
+
+            spawnOrderIndex++;
+            if (spawnOrderIndex >= idList.Count)
+            {
+                spawnOrderIndex = 0;
+                setID = 0;
+            }
+
+            sosigID = idList[spawnOrderIndex];
+        }
+        else
+        {
+            setID = Random.Range(0, sets.Count);
+            //RANDOM
+            TGM_SosigTeam.SosigSet selectedSet = sets[setID];
+
+            //Team specific Sosigs
+            if (iff == TGM_Gamemode.redIFF)
+                sosigID = selectedSet.sosigEnemyIDsRed[Random.Range(0, selectedSet.sosigEnemyIDsRed.Length)];
+            else
+                sosigID = selectedSet.sosigEnemyIDsBlue[Random.Range(0, selectedSet.sosigEnemyIDsBlue.Length)];
+        }
+
+        return new SosigSetGroup { id = sosigID, set = setID };
+    }
+
+    public Sosig CreateTeamSosig(SosigAPI.SpawnOptions spawnOptions, Vector3 position, Quaternion rotation, int sosigID)
+    {
         Sosig sosig =
             SosigAPI.Spawn(
                 IM.Instance.odicSosigObjsByID[(SosigEnemyID)sosigID],
@@ -192,6 +228,9 @@ public class TGM_Team
         sosig.FallbackOrder = Sosig.SosigOrder.Assault;
         sosig.CommandAssaultPoint(spawnOptions.SosigTargetPosition);
         sosig.MoveSpeed = Sosig.SosigMoveSpeed.Running;
+
+        //Stop them dropping weapons - they become useless and take up sosig count
+        sosig.DoesDropWeaponsOnBallistic = false;
 
         //Assign to Empty Slot
         int sosigDataIndex = 0;

@@ -22,6 +22,8 @@ public class TGM_Scene : MonoBehaviour
     [HideInInspector]
     public Quaternion defaultResetRotation;
 
+    public NavMeshSurface vehicleNavMesh;
+
     [Header("Menus")]
     public Transform mainMenu;
     public Transform teamSetupMenu;

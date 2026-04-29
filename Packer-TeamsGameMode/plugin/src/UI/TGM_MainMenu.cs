@@ -47,8 +47,8 @@ public class TGM_MainMenu : MonoBehaviour
     public TGM_Button[] gamemodesBtns;
 
 
-    public delegate void SetupDelegate();
-    public static event SetupDelegate PreGamemodeSetupEvent;
+    public delegate void PreGameDelegate();
+    public static event PreGameDelegate PreGamemodeSetupEvent;
 
     void Awake()
     {
