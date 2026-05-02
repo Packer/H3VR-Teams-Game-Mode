@@ -106,6 +106,7 @@ public class TGM_Team
                 //Debug.Log(spawnArea.position + " : " + spawnPoint);
                 Sosig s = CreateTeamSosig(_spawnOptions, spawnPoint, spawnArea.rotation, group.id);
 
+                /*
                 //Vehicle sosig? On the Vehicle navMesh
                 if (useVehicle && TGM_Scene.instance.vehicleNavMesh != null)
                 {
@@ -121,6 +122,7 @@ public class TGM_Team
                     }
 
                 }
+                */
 
                 TGM_Manager.instance.gamemode.OnSosigCreate(s);
 
