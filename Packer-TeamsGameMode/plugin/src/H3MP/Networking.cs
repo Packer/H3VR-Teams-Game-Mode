@@ -9,16 +9,16 @@ namespace H3MP.Networking;
 
 public class Networking
 {
-    static byte h3mp = 2; // 0 - No H3MP | 1 - H3MP | 2 - Not Checked 
+    static byte enabled = 2; // 0 - No H3MP | 1 - H3MP | 2 - Not Checked 
 
-    public static bool H3MP
+    public static bool H3MPEnabled
     {
         get
         {
-            if (h3mp == 2)
-                h3mp = (byte)(Chainloader.PluginInfos.ContainsKey("VIP.TommySoucy.H3MP") ? 1 : 0);
+            if (enabled == 2)
+                enabled = (byte)(Chainloader.PluginInfos.ContainsKey("VIP.TommySoucy.H3MP") ? 1 : 0);
 
-            return h3mp == (byte)1 ? true : false;
+            return enabled == (byte)1 ? true : false;
         }
     }
 
@@ -28,7 +28,7 @@ public class Networking
     /// <returns></returns>
     public static bool ServerRunning()
     {
-        if (H3MP)
+        if (H3MPEnabled)
             return isServerRunning;
 
         return false;
@@ -51,7 +51,7 @@ public class Networking
     /// <returns></returns>
     public static bool IsClient()
     {
-        if (H3MP)
+        if (H3MPEnabled)
             return isClient();
 
         return false;
@@ -73,7 +73,7 @@ public class Networking
     /// <returns></returns>
     public static bool IsHost()
     {
-        if (H3MP)
+        if (H3MPEnabled)
             return isHosting;
 
         return false;
@@ -95,7 +95,7 @@ public class Networking
 
     public static int GetPlayerCount()
     {
-        if (H3MP)
+        if (H3MPEnabled)
             return GetNetworkPlayerCount();
         return 1;
     }
@@ -182,6 +182,91 @@ public class Networking
         else
             return null;    //Maybe return a blank player instead (vector3 zero)
     }
+
+
+
+
+    //---------------------------------------------------------------
+    //WIP
+    //---------------------------------------------------------------
+
+
+    private static int highLevelID = -1;
+    private bool HasSetup = false;
+
+    //Database of all mods using this
+    private static Dictionary<string, ushort> modDB = new Dictionary<string, ushort>();
+    public delegate void UpdateHandlerDelegate(string uniqueID, Packet packet);
+    public static event UpdateHandlerDelegate UpdateHandlerEvent;
+
+
+    // ----------------------------------------------
+    // Mod Example Zone
+    // ----------------------------------------------
+    public string modName = "ModExample";
+
+    void ModStart()
+    {
+        //Shorten for Mods but the namespace etc
+        H3MP.Networking.Networking.UpdateHandlerEvent += DataReciever;
+        H3MP.Networking.Networking.ModSetup(modName);
+    }
+
+    void DataSender()
+    {
+        Packet packet = new Packet();
+        packet.Write("Example");
+        SendData(packet);
+    }
+
+    void DataReciever(string mod, Packet packet)
+    {
+        if (mod != modName)
+            return;
+    }
+
+    // ----------------------------------------------
+    // Auto Networking Setup
+    // ----------------------------------------------
+
+    void PluginStart()
+    {
+        //Add our Setup method to when we Host a game (OnHostClicked)
+        Mod.OnConnection += Setup;
+    }
+
+    void Setup()
+    {
+        if (HasSetup)
+            return;
+        HasSetup = true;
+
+        //SETUP HERE
+    }
+
+    public static void ModSetup(string modName)
+    {
+        ushort index = (ushort)(modDB.Count + 1);
+
+        modDB.Add(modName, index);
+    }
+
+
+    /// <summary>
+    /// The generic data reciever for H3MP Mods
+    /// </summary>
+    /// <param name="clientID"></param>
+    /// <param name="packet"></param>
+    void Update_Handler(int clientID, Packet packet)
+    {
+        ushort index = packet.ReadUShort();
+
+    }
+
+    public static void SendData(Packet packet)
+    {
+        ServerSend.SendTCPDataToAll(packet, true);
+    }
 }
 
 
@@ -232,4 +317,5 @@ public class PlayerData
             handRight = GameManager.players[i].rightHand,
         };
     }
+
 }

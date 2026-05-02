@@ -130,7 +130,7 @@ public class TGM_Area : MonoBehaviour
         return GetRandomAreaPositions(area);
     }
 
-    //TODO THIS NEEDS TO BE RELATIVE TO WHAT TEAM IS REQUESTING THIS DATA
+
     public List<Vector3> GetRandomDefendArea()
     {
         //Error backup
@@ -262,6 +262,9 @@ public class TGM_Area : MonoBehaviour
             {
                 for (int i = 0; i < spawnPoints[s].sosigAttackAreas.Length; i++)
                 {
+                    if (spawnPoints[s].sosigAttackAreas[i] == null)
+                        continue;
+
                     Gizmos.DrawCube(spawnPoints[s].sosigAttackAreas[i].position, spawnPoints[s].sosigAttackAreas[i].lossyScale);
                     for (int x = 0; x < attackIcon.Length; x++)
                     {
@@ -280,6 +283,10 @@ public class TGM_Area : MonoBehaviour
 
                 for (int i = 0; i < spawnPoints[s].sosigDefendAreas.Length; i++)
                 {
+                    if (spawnPoints[s].sosigDefendAreas[i] == null)
+                        continue;
+
+
                     Gizmos.DrawCube(spawnPoints[s].sosigDefendAreas[i].position, spawnPoints[s].sosigDefendAreas[i].lossyScale);
                     Gizmos.DrawWireCube(spawnPoints[s].sosigDefendAreas[i].position, spawnPoints[s].sosigDefendAreas[i].lossyScale);
 

@@ -70,6 +70,9 @@ public class TGM_Scene : MonoBehaviour
     [System.Serializable]
     public class TeamSpawnRoom
     {
+        [Tooltip("For array display only, does nothing")]
+        public string name;
+
         [Tooltip("The area which a player can respawn, can be scaled")]
         public Transform respawnArea;   //Based on Gizmo
         [Tooltip("The Starting area for this Team")]
@@ -116,7 +119,7 @@ public class TGM_Scene : MonoBehaviour
         TGM_Manager manager = Instantiate(TGM_ModLoader.tgmAssets.manager);
 
         //Add Networking if H3MP is enabled
-        if (Networking.H3MP)
+        if (Networking.H3MPEnabled)
             manager.gameObject.AddComponent<TGM_Networking>();
         yield return new WaitForEndOfFrame();
 
@@ -151,6 +154,7 @@ public class TGM_Scene : MonoBehaviour
         }
 
     }
+
     void OnDrawGizmos()
     {
         Color newColor = Color.green;
@@ -252,6 +256,10 @@ public class TGM_Scene : MonoBehaviour
                 }
                 teams = newTeams.ToArray();
             }
+
+            teams[0].name = "Red";
+            teams[1].name = "Blue";
+
         }
 
         if (areas != null)

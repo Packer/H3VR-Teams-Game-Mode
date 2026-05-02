@@ -14,6 +14,8 @@ public class TGM_Networking : MonoBehaviour
 
     private int updatePlayerStats = -1;
 
+    #region old
+
     [Serializable]
     public class NetworkData
     {
@@ -92,6 +94,7 @@ public class TGM_Networking : MonoBehaviour
         }
     }
     */
+#endregion
 
     void Awake()
     {
@@ -103,7 +106,6 @@ public class TGM_Networking : MonoBehaviour
         if (Networking.IsHost() || Client.isFullyConnected)
             SetupPacketTypes();
     }
-
 
     void SetupPacketTypes()
     {
@@ -173,4 +175,44 @@ public class TGM_Networking : MonoBehaviour
             Mod.CustomPacketHandlerReceived -= StatsUpdate_Received;
         }
     }
+
+
+    //---------------------------------------------------------------
+    //WIP
+    //---------------------------------------------------------------
+
+    void Update_Handler(int clientID, Packet packet)
+    {
+        byte index = packet.ReadByte();
+
+        if (UpdateHandlerEvent != null)
+            UpdateHandlerEvent.Invoke(index, packet);
+    }
+
+    public static void UpdateScore(ushort uniqueID, Packet packet)
+    {
+        if (uniqueID != 14)
+            return;
+
+
+        int idIndex = packet.ReadInt();
+        int teamAScore = packet.ReadInt();
+        int teamBScore = packet.ReadInt();
+
+    }
+
+    void SendData()
+    {
+        UpdateHandlerEvent += UpdateScore;
+
+        Packet packet = new Packet(updatePlayerStats);
+
+        packet.Write((byte)14);
+        ServerSend.SendTCPDataToAll(packet, true);
+    }
+
+
+    public delegate void UpdateHandlerDelegate(ushort uniqueID, Packet packet);
+    public static event UpdateHandlerDelegate UpdateHandlerEvent;
+
 }

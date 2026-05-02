@@ -218,7 +218,7 @@ public class TGM_MainMenu : MonoBehaviour
             }
         }
 
-        if (Networking.H3MP)
+        if (Networking.H3MPEnabled)
         {
             //Send Settings
 
@@ -227,7 +227,7 @@ public class TGM_MainMenu : MonoBehaviour
 
     public void RequestSettings()
     {
-        if (Networking.H3MP)
+        if (Networking.H3MPEnabled)
         {
             //Request settings from Host
         }

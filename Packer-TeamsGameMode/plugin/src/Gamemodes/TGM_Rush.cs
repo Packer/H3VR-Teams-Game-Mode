@@ -293,7 +293,7 @@ public class TGM_Rush : TGM_Gamemode
                 TGM_Scene.UpdateAllAreas();
 
                 if(blueArea < capturePoints.Count)
-                    SetSosigOrders();
+                    UpdateSosigOrders();
             }
         }
     }
@@ -309,6 +309,7 @@ public class TGM_Rush : TGM_Gamemode
             //Defenders
             TGM_Sosigs.OrderSosigToLocations(s, TGM_Manager.instance.team[iff].currentSpawnArea.GetRandomDefendArea());
 
+            /*
             //If in pregame, get sosigs to GUARD their positions
             if (TGM_Manager.gameState == TGM_Manager.GameStateEnum.Pregame)
             {
@@ -316,6 +317,7 @@ public class TGM_Rush : TGM_Gamemode
                 s.FallbackOrder = Sosig.SosigOrder.GuardPoint;
                 s.SetCurrentOrder(Sosig.SosigOrder.GuardPoint);
             }
+            */
         }
         else
         {
@@ -347,7 +349,7 @@ public class TGM_Rush : TGM_Gamemode
         }
     }
 
-    void SetSosigOrders()
+    void UpdateSosigOrders()
     {
         for (int iff = 0; iff < TGM_Manager.instance.team.Length; iff++)
         {
@@ -359,7 +361,7 @@ public class TGM_Rush : TGM_Gamemode
 
                 if (iff == blueIFF)
                 {
-                    //Defenders
+                    //Blue Defenders
                     TGM_Sosigs.OrderSosigToLocations(s, TGM_Manager.instance.team[iff].currentSpawnArea.GetRandomDefendArea());
                 }
                 else

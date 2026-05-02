@@ -29,7 +29,7 @@ namespace TeamsGameMode
         void DebugSceneLoad()
         {
 
-            string sceneName = "TeamsGameModeExample";
+            string sceneName = "TeamsGamemode_Example";
 
             print("Attempting to load scene: " + sceneName);
             CustomSceneInfo? info = AtlasPlugin.GetCustomScene(sceneName);
