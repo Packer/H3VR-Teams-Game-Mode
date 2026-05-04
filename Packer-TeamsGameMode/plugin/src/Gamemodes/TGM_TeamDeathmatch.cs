@@ -76,7 +76,7 @@ public class TGM_TeamDeathmatch : TGM_Gamemode
     {
         base.Update();
 
-        if (Networking.IsClient())
+        if (Tools.IsClient())
             return;
 
         //Only update during gameplay
@@ -146,16 +146,17 @@ public class TGM_TeamDeathmatch : TGM_Gamemode
         }
     }
 
-    public override void AdjustTeamScore(int teamID, int amount)
+    public override void AdjustTeamScore(int teamID, int amount, bool network = true)
     {
         if (TGM_Manager.gameState != TGM_Manager.GameStateEnum.Gameplay)
             return;
 
-        base.AdjustTeamScore(teamID, amount);
-
         //Increase player score
-        if(teamID == GM.CurrentPlayerBody.GetPlayerIFF())
+        if (teamID == GM.CurrentPlayerBody.GetPlayerIFF())
             TGM_Manager.instance.localPlayer.score += amount;
+
+        base.AdjustTeamScore(teamID, amount, network);
+
     }
 
     public override void OnSosigCreate(Sosig s)

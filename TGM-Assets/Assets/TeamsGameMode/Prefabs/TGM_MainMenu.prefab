@@ -1662,7 +1662,18 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 114892688010088304}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 114428654702161810}
+        m_MethodName: AdjustGamemodeSettingValue
+        m_Mode: 3
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 1
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
     m_TypeName: UnityEngine.UI.Button+ButtonClickedEvent, UnityEngine.UI, Version=1.0.0.0,
       Culture=neutral, PublicKeyToken=null
 --- !u!114 &114173013719080650
@@ -3098,7 +3109,18 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 114560259408055858}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 114428654702161810}
+        m_MethodName: AdjustGamemodeSettingValue
+        m_Mode: 3
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: -1
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
     m_TypeName: UnityEngine.UI.Button+ButtonClickedEvent, UnityEngine.UI, Version=1.0.0.0,
       Culture=neutral, PublicKeyToken=null
 --- !u!114 &114486396320520390
@@ -3565,6 +3587,7 @@ MonoBehaviour:
   gameSettingPrefab: {fileID: 1002492998871588}
   gamemodeSettingPrefab: {fileID: 1930703105529042}
   requestButton: {fileID: 1143403890323264}
+  gamemodeTitleText: {fileID: 114724991494901448}
   teamButtons:
   - {fileID: 114461663915745988}
   - {fileID: 114439175903564496}

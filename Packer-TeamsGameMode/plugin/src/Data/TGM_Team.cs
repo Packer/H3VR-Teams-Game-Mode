@@ -4,6 +4,7 @@ using UnityEngine.AI;
 using System.Collections.Generic;
 using Sodalite.Api;
 using Random = UnityEngine.Random;
+using H3MP.Networking;
 
 namespace TeamsGameMode;
 
@@ -73,9 +74,19 @@ public class TGM_Team
             TGM_ClassMenu.instance.spawnButtonText.text = "Spawn";
         }
 
+        //Only Server spawns sosigs
+        if (Tools.ServerRunning())
+        {
+            if (Tools.IsHost())
+                TGM_Network.SpawnPlayers_ToClients();
+            else
+                return;
+        }
+
         //Spawn Sosigs
         if (sosigs.Count < sosigLimit)
         {
+
             int sosigRemain = sosigLimit - sosigs.Count;
             SosigAPI.SpawnOptions _spawnOptions = new SosigAPI.SpawnOptions
             {
@@ -94,7 +105,7 @@ public class TGM_Team
 
                 //Use Vehicle spawns for vehicle sosigs
                 if (useVehicle
-                    && currentSpawnArea.spawnPoints[iff].sosigVehicleSpawnPoints != null 
+                    && currentSpawnArea.spawnPoints[iff].sosigVehicleSpawnPoints != null
                     && currentSpawnArea.spawnPoints[iff].sosigVehicleSpawnPoints.Length > 0)
                 {
                     spawnArea = currentSpawnArea.spawnPoints[iff].sosigVehicleSpawnPoints[Random.Range(0, currentSpawnArea.spawnPoints[iff].sosigVehicleSpawnPoints.Length)];

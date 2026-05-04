@@ -357,9 +357,9 @@ public class TGM_ModLoader
 
     public static int GetGamemodeIndex(string gamemodeName)
     {
-        for (int i = 0; i < TGM_Manager.gamemodes.Count; i++)
+        for (int i = 0; i < TGM_Manager.instance.gamemodes.Count; i++)
         {
-            if (TGM_Manager.gamemodes[i].name == gamemodeName)
+            if (TGM_Manager.instance.gamemodes[i].name == gamemodeName)
                 return i;
         }
         return 0;

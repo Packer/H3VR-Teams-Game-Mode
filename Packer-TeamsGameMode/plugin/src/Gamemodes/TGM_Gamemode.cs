@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using FistVR;
 using UnityEngine;
+using H3MP.Networking;
 
 
 namespace TeamsGameMode;
@@ -225,13 +226,22 @@ public class TGM_Gamemode
     /// </summary>
     /// <param name="teamIFF"></param>
     /// <param name="amount"></param>
-    public virtual void AdjustTeamScore(int teamIFF, int amount)
+    public virtual void AdjustTeamScore(int teamIFF, int amount, bool network = true)
     {
         TeamGameModePlugin.Logger.LogDebug($"Gamemode: Adjust Team:" + teamIFF + " Score: " + amount);
 
         if (TGM_Manager.gameState != TGM_Manager.GameStateEnum.Gameplay)
             return;
         TGM_Manager.instance.team[teamIFF].currentScore += amount;
+
+        //Network
+        if (Tools.ServerRunning() && network)
+        {
+            if (Tools.IsHost())
+                TGM_Network.AdjustScores_ToClients(teamIFF, amount);
+            else
+                TGM_Network.AdjustScores_ToServer(teamIFF, amount);
+        }
     }
 
     public virtual void OnSosigCreate(Sosig s)

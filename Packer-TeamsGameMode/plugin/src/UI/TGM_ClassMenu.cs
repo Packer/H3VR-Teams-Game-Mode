@@ -257,7 +257,7 @@ public class TGM_ClassMenu : MonoBehaviour
             {
                 FVRObject fvrContainer = null;
                 FVRObject fvrCartridge = null;
-                FVRPhysicalObject spawnContainer = null;
+                FVRPhysicalObject[] spawnContainer = new FVRPhysicalObject[itemSet.ammoCount];
                 FVRPhysicalObject spawnCartridge = null;
 
                 //Magazine / Speed Loader / Clip
@@ -272,13 +272,13 @@ public class TGM_ClassMenu : MonoBehaviour
                     {
                         for (int a = 0; a < itemSet.ammoCount; a++)
                         {
-                            spawnContainer = Global.SpawnFVRObject(
+                            spawnContainer[a] = Global.SpawnFVRObject(
                                 fvrContainer,
                                 instance.ammoSpawns[spawnMainIndex].position + (Vector3.up * 0.1f) + (Vector3.right * 0.1f * a),
                                 instance.ammoSpawns[spawnMainIndex].rotation.eulerAngles);
 
-                            if (spawnContainer != null)
-                                TGM_Manager.instance.localPlayer.playersItems.Add(spawnContainer);
+                            if (spawnContainer[a] != null)
+                                TGM_Manager.instance.localPlayer.playersItems.Add(spawnContainer[a]);
                         }
                     }
                 }
@@ -296,17 +296,19 @@ public class TGM_ClassMenu : MonoBehaviour
                         bool spawnRaw = false;
 
                         //We have a magazine waiting and ready
-                        if (fvrContainer != null && spawnContainer != null)
+                        if (fvrContainer != null && spawnContainer != null && spawnContainer.Length > 0)
                         {
-                            //Is it compatible
-                            if (fvrCartridge.RoundType == fvrContainer.RoundType)
+                            for (int a = 0; a < itemSet.ammoCount; a++)
                             {
-                                //Fill Container with our Cartridge
-                                Global.ReloadWithCartridge(spawnContainer, fvrCartridge);
+                                //Is it compatible
+                                if (fvrCartridge.RoundType == fvrContainer.RoundType)
+                                {
+                                    //Fill Container with our Cartridge
+                                    Global.ReloadWithCartridge(spawnContainer[a], fvrCartridge);
+                                }
+                                else
+                                    spawnRaw = true;
                             }
-                            else
-                                spawnRaw = true;
-
                         }
                         else
                             spawnRaw = true;

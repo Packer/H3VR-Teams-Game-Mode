@@ -7,6 +7,8 @@ namespace TeamsGameMode;
 
 public class TGM_Area : MonoBehaviour
 {
+    [HideInInspector]
+    public int index = -1;
 
     [Header("Gameplay")]
     [HideInInspector, Tooltip("Owner\nNeutral: -1\nRed: 0\nBlue: 1")]
@@ -116,7 +118,7 @@ public class TGM_Area : MonoBehaviour
     /// Returns 2 patrol points and 3rd index as rotation 
     /// </summary>
     /// <returns></returns>
-    public List<Vector3> GetRandomAttackArea()
+    public List<Vector3> GetRandomAttackArea(bool inverse = false)
     {
         //Error backup
         if (iff < 0)
@@ -125,13 +127,17 @@ public class TGM_Area : MonoBehaviour
             return GetObjectiveArea();
         }
 
-        Transform area = spawnPoints[iff].sosigAttackAreas[Random.Range(0, spawnPoints[iff].sosigAttackAreas.Length)];
-        //Transform area = spawnPoints[].sosigAttackAreas[Random.Range(0, sosigAttackAreas.Length)];
+        Transform area;
+            if(inverse)
+            area = spawnPoints[Global.GetEnemyIFF(iff)].sosigAttackAreas[Random.Range(0, spawnPoints[Global.GetEnemyIFF(iff)].sosigAttackAreas.Length)];
+        else
+            area = spawnPoints[iff].sosigAttackAreas[Random.Range(0, spawnPoints[iff].sosigAttackAreas.Length)];
+
         return GetRandomAreaPositions(area);
     }
 
 
-    public List<Vector3> GetRandomDefendArea()
+    public List<Vector3> GetRandomDefendArea(bool inverse = false)
     {
         //Error backup
         if (iff < 0)
@@ -140,9 +146,15 @@ public class TGM_Area : MonoBehaviour
             return GetObjectiveArea();
         }
         
-        Transform area = spawnPoints[iff].sosigDefendAreas[Random.Range(0, spawnPoints[iff].sosigDefendAreas.Length)];
+        Transform area;
+        if (inverse)
+            area = spawnPoints[Global.GetEnemyIFF(iff)].sosigDefendAreas[Random.Range(0, spawnPoints[Global.GetEnemyIFF(iff)].sosigDefendAreas.Length)];
+        else
+            area = spawnPoints[iff].sosigDefendAreas[Random.Range(0, spawnPoints[iff].sosigDefendAreas.Length)];
+
         return GetRandomAreaPositions(area);
     }
+
     public List<Vector3> GetObjectiveArea()
     {
         Transform area = objective;

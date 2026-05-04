@@ -2,7 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using FistVR;
-using TeamsGameMode.H3MP;
+using H3MP.Networking;
 
 namespace TeamsGameMode;
 
@@ -11,7 +11,7 @@ public class TGM_Manager : MonoBehaviour
     public static TGM_Manager instance;
     //public static TGM_Profile profile;
     public static GameStateEnum gameState = GameStateEnum.GamemodeSelect;
-    public static List<TGM_Gamemode> gamemodes = new List<TGM_Gamemode>();
+    public List<TGM_Gamemode> gamemodes = new List<TGM_Gamemode>();
 
     public Sprite[] gamemodeThumbnails;
 
@@ -106,14 +106,37 @@ public class TGM_Manager : MonoBehaviour
         team[1].teamName = "Blue";
         team[1].color = new Color(0.3764f, 0.3764f, 1f);
 
+        //Setup Areas
+        for (int i = 0; i < TGM_Scene.instance.areas.Length; i++)
+        {
+            if (TGM_Scene.instance.areas[i] != null)
+            {
+                TGM_Scene.instance.areas[i].index = i;
+            }
+        }
+
         //Setup our other systems
         TGM_TeamSetup.instance.Setup();
         TGM_MainMenu.instance.Setup();
         TGM_ProfileMenu.instance.Setup();
 
-        TeamGameModePlugin.Logger.LogMessage($"Setup Complete");
+        //Setup H3MP
+        if (Tools.ServerRunning())
+            TGM_Network.Setup();
 
         SetGameState(GameStateEnum.GamemodeSelect);
+
+        TeamGameModePlugin.Logger.LogMessage($"TGM Setup Complete");
+    }
+
+    void OnDestroy()
+    {
+        if(Tools.H3MPEnabled)
+            TGM_Network.OnDestroyed();
+
+        //Clear old gamemode settings on scene change
+        gamemode = null;
+        TGM_Settings.gamemodeSettings.Clear();
     }
 
     void Awake()
@@ -193,8 +216,10 @@ public class TGM_Manager : MonoBehaviour
         switch (state)
         {
             case GameStateEnum.GamemodeSelect:
+                TGM_MainMenu.instance.OpenPage(TGM_MainMenu.Page.Gamemode);
                 break;
             case GameStateEnum.Setup:       //Gamemode being configured
+                TGM_MainMenu.instance.OpenPage(TGM_MainMenu.Page.GameSettings);
                 gamemode.Setup();
                 startTime = 0;               //Reset Playtime to zero;
                 TGM_TeamSetup.instance.gameObject.SetActive(true);
@@ -203,22 +228,30 @@ public class TGM_Manager : MonoBehaviour
                 SetColorBlind();
                 break;
             case GameStateEnum.Pregame:     //30 sec Count down to game start
+                TGM_MainMenu.instance.OpenPage(TGM_MainMenu.Page.JoinTeam);
                 startTime = Time.time + TGM_Gamemode.gameStartDelay;
                 gamemode.Pregame();
                 break;
             case GameStateEnum.Gameplay:    //Combat
+                TGM_MainMenu.instance.OpenPage(TGM_MainMenu.Page.JoinTeam);
                 gamemode.GameplayStart();
                 break;
             case GameStateEnum.Postgame:    //30 Sec post gameplay
+                TGM_MainMenu.instance.OpenPage(TGM_MainMenu.Page.JoinTeam);
                 gamemode.Postgame();
                 break;
             case GameStateEnum.Gameover:    //Final Scores, Wait for master or wait for all players to ready
+                TGM_MainMenu.instance.OpenPage(TGM_MainMenu.Page.JoinTeam);
                 gamemode.GameOver();
                 break;
         }
 
         // Put Networking state change here
-        //if(TGM_Networking.server)
+        if (Tools.ServerRunning() && Tools.IsHost())
+        {
+            //Send Settings
+            TGM_Network.GameSettings_ToClients();
+        }
     }
 
     public IEnumerator SetGameStateDelayed(GameStateEnum state, float delay)

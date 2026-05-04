@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
 using FistVR;
+using H3MP.Networking;
 
 namespace TeamsGameMode;
 
@@ -47,6 +48,36 @@ public class TGM_Button : MonoBehaviour
         TGM_MainMenu.instance.UpdateSettings();
     }
 
+    public void AdjustGamemodeSettingValue(int amount)
+    {
+        TGM_Settings.Setting setting = TGM_Settings.gamemodeSettings[index];
+
+        amount *= setting.intIncrement;
+
+        //Loop Around
+        if (setting.intMax == 0 && setting.intMin == 0)
+        {
+            value += amount;
+        }
+        else
+        {
+            if (value + amount > setting.intMax)
+                value = setting.intMin;
+            else if (value + amount < setting.intMin)
+                value = setting.intMax;
+            else
+                value += amount;
+        }
+
+        TGM_Manager.PlayAudio(TGM_Manager.PlayAudioEnum.Press);
+
+        //Assign Game Setting
+        TGM_Settings.SetModeSetting(index, value);
+        //TGM_Settings.gameSettings[index].value = value;
+
+        TGM_MainMenu.instance.UpdateSettings();
+    }
+
     public void ChooseGamemode()
     {
         TGM_MainMenu.instance.SelectGamemode(index);
@@ -66,7 +97,9 @@ public class TGM_Button : MonoBehaviour
 
     public void JoinTeam(int iff)
     {
-        GM.CurrentPlayerBody.SetPlayerIFF(iff);
+        //Use Tools to set player IFF
+        Tools.SetLocalPlayerIFF(iff);
+
         TGM_Manager.PlayAudio(TGM_Manager.PlayAudioEnum.Confirm);
 
         if (iff == -3)

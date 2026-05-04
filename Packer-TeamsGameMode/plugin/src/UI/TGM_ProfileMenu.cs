@@ -26,7 +26,7 @@ public class TGM_ProfileMenu : MonoBehaviour
     public void Setup()
     {
 
-        if (Networking.IsClient())
+        if (Tools.IsClient())
         {
             loadProfileButton.SetActive(false);
         }
@@ -68,13 +68,13 @@ public class TGM_ProfileMenu : MonoBehaviour
                 }
 
                 //Load Game Settings
-                for (int x = 0; x < TGM_Settings.gameSettings.Count; x++)
+                for (int x = 0; x < TGM_Profile.profile.gameSettings.Count; x++)
                 {
                     TGM_Settings.gameSettings[x].value = TGM_Profile.profile.gameSettings[x];
                 }
 
                 //Load Gamemode Settings
-                for (int x = 0; x < TGM_Settings.gamemodeSettings.Count; x++)
+                for (int x = 0; x < TGM_Profile.profile.gamemodeSettings.Count; x++)
                 {
                     TGM_Settings.gamemodeSettings[x].value = TGM_Profile.profile.gamemodeSettings[x];
                 }

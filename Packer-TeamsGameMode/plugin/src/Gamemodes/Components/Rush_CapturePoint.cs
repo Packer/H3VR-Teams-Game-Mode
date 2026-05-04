@@ -95,6 +95,10 @@ public class Rush_CapturePoint : MonoBehaviour
 
     public void CapturePoint()
     {
+        //Already set
+        if (spawnedPrefab != null)
+            return;
+
         //Called on all clients
         spawnedPrefab = Instantiate(capturedPrefab, transform.position, transform.rotation);
         spawnedPrefab.SetActive(true);
@@ -110,17 +114,7 @@ public class Rush_CapturePoint : MonoBehaviour
 
     void SendCapture()
     {
-        Debug.Log("SENDING CAPTURE NOTIFICATION");
-        //Host
-        if (!Networking.IsClient())
-        {
-            TGM_Manager.instance.gamemode.AdjustTeamScore(detectIFF, 1);
-            return;
-        }
-        else
-        {
-            //Tell Server we captured it!
-        }
+        TGM_Manager.instance.gamemode.AdjustTeamScore(detectIFF, 1);
     }
 
     bool IsCapturing()

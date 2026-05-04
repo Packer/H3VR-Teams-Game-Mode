@@ -29,6 +29,7 @@ public class TGM_MainMenu : MonoBehaviour
     public GameObject gameSettingPrefab;
     public GameObject gamemodeSettingPrefab;
     public GameObject requestButton;
+    public Text gamemodeTitleText;
 
     //Put Base Game settings here
     //Save Data?
@@ -61,21 +62,20 @@ public class TGM_MainMenu : MonoBehaviour
         SetupGamemodes();
         SetupSettings();
 
-        if (Networking.IsClient())
+        if (Tools.IsClient() && Tools.ServerRunning())
         {
-            //Multiplayer
+            //Multiplayer Client
             requestButton.SetActive(true);
             startButton.SetActive(false);
         }
         else
         {
-            //Single Player
+            //Single Player / Host
             requestButton.SetActive(false);
             startButton.SetActive(true);
         }
 
-        //Default page
-        OpenPage(Page.Gamemode);
+        TGM_Manager.instance.SetGameState(TGM_Manager.GameStateEnum.GamemodeSelect);
     }
 
 
@@ -85,13 +85,13 @@ public class TGM_MainMenu : MonoBehaviour
 
     public void SetupGamemodes()
     {
-        for (int i = 0; i < TGM_Manager.gamemodes.Count; i++)
+        for (int i = 0; i < TGM_Manager.instance.gamemodes.Count; i++)
         {
             //Empty or Not Valid continue
-            if (!TGM_Manager.gamemodes[i].IsGamemodeValid())
+            if (!TGM_Manager.instance.gamemodes[i].IsGamemodeValid())
                 continue;
 
-            TGM_Gamemode gm = TGM_Manager.gamemodes[i];
+            TGM_Gamemode gm = TGM_Manager.instance.gamemodes[i];
 
             TGM_Button btn = Instantiate(gamemodeBtnPrefab, gamemodeBtnPrefab.transform.parent).GetComponent<TGM_Button>();
             btn.gameObject.SetActive(true);
@@ -104,14 +104,18 @@ public class TGM_MainMenu : MonoBehaviour
 
     public void SelectGamemode(int index)
     {
-        TeamGameModePlugin.Logger.LogMessage($"Gamemode Selected: " + TGM_Manager.gamemodes[index].name);
+        TeamGameModePlugin.Logger.LogMessage($"Gamemode Selected: " + TGM_Manager.instance.gamemodes[index].name);
 
         //If not already assigned, assign the gamemode
-        if (TGM_Manager.instance.gamemode != TGM_Manager.gamemodes[index])
+        if (TGM_Manager.instance.gamemode != TGM_Manager.instance.gamemodes[index])
         {
-            TGM_Manager.instance.gamemode = TGM_Manager.gamemodes[index];
+            TGM_Manager.instance.gamemode = TGM_Manager.instance.gamemodes[index];
             TGM_Manager.instance.gamemode.LoadDefaultProfile();
         }
+
+        //Menu Title
+        if(gamemodeTitleText != null)
+            gamemodeTitleText.text = TGM_Manager.instance.gamemode.name;
 
         //Reset Team stats for 2nd playthrough
         for (int i = 0; i < TGM_Manager.instance.team.Length; i++)
@@ -122,7 +126,6 @@ public class TGM_MainMenu : MonoBehaviour
         //Reset player Tracking
         TGM_Manager.instance.localPlayer.ResetPlayer();
 
-        OpenPage(Page.GameSettings);
         UpdateSettings();
         TGM_Manager.instance.SetGameState(TGM_Manager.GameStateEnum.Setup);
     }
@@ -146,6 +149,22 @@ public class TGM_MainMenu : MonoBehaviour
 
             //Assign button to Setting
             TGM_Settings.gameSettings[i].button = btn;
+        }
+
+        UpdateSettings();
+    }
+
+    public void SetupGamemodeSettings()
+    {
+
+        for (int i = 0; i < TGM_Settings.gamemodeSettings.Count; i++)
+        {
+            TGM_Button btn = Instantiate(gamemodeSettingPrefab, gamemodeSettingPrefab.transform.parent).GetComponent<TGM_Button>();
+            btn.gameObject.SetActive(true);
+            btn.index = i;
+
+            //Assign button to Setting
+            TGM_Settings.gamemodeSettings[i].button = btn;
         }
 
         UpdateSettings();
@@ -178,7 +197,38 @@ public class TGM_MainMenu : MonoBehaviour
                 btn.texts[1].text = TGM_Settings.gameSettings[i].value.ToString(); //Number
 
 
-            if (Networking.IsClient() && !TGM_Settings.gameSettings[i].localOnly)
+            if (Tools.IsClient() && !TGM_Settings.gameSettings[i].localOnly)
+            {
+                btn.buttons[0].gameObject.SetActive(false);
+                btn.buttons[1].gameObject.SetActive(false);
+            }
+        }
+
+        //Gamemode Settings
+        for (int i = 0; i < TGM_Settings.gamemodeSettings.Count; i++)
+        {
+            TGM_Button btn = TGM_Settings.gamemodeSettings[i].button;
+            if (btn == null)
+                continue;
+
+            btn.value = TGM_Settings.gamemodeSettings[i].value;
+            btn.texts[0].text = TGM_Settings.gamemodeSettings[i].description;
+
+            //Current Setting
+            if (TGM_Settings.gamemodeSettings[i].type == TGM_Settings.Setting.SettingType.Strings)
+                btn.texts[1].text = TGM_Settings.gamemodeSettings[i].settings[TGM_Settings.gamemodeSettings[i].value]; //Text
+            else if (TGM_Settings.gamemodeSettings[i].type == TGM_Settings.Setting.SettingType.FirstString)
+            {
+                //Set to first String name (Default) else use raw numbers
+                if (TGM_Settings.gamemodeSettings[i].value == 0)
+                    btn.texts[1].text = TGM_Settings.gamemodeSettings[i].settings[TGM_Settings.gamemodeSettings[i].value]; //Text
+                else
+                    btn.texts[1].text = TGM_Settings.gamemodeSettings[i].value.ToString(); //Number
+            }
+            else
+                btn.texts[1].text = TGM_Settings.gamemodeSettings[i].value.ToString(); //Number
+
+            if (Tools.IsClient() && !TGM_Settings.gamemodeSettings[i].localOnly)
             {
                 btn.buttons[0].gameObject.SetActive(false);
                 btn.buttons[1].gameObject.SetActive(false);
@@ -214,18 +264,21 @@ public class TGM_MainMenu : MonoBehaviour
             }
         }
 
-        if (Networking.H3MPEnabled)
+        if (Tools.ServerRunning()
+            && Tools.IsHost() 
+            && TGM_Manager.gameState != TGM_Manager.GameStateEnum.GamemodeSelect)
         {
             //Send Settings
-
+            TGM_Network.GameSettings_ToClients();
         }
     }
 
     public void RequestSettings()
     {
-        if (Networking.H3MPEnabled)
+        if (Tools.ServerRunning())
         {
             //Request settings from Host
+            TGM_Network.RequestSettings_ToServer();
         }
     }
 
@@ -264,7 +317,6 @@ public class TGM_MainMenu : MonoBehaviour
         }
 
         TGM_Manager.instance.SetGameState(TGM_Manager.GameStateEnum.Pregame);
-        OpenPage(Page.JoinTeam);
         TeamGameModePlugin.Logger.LogMessage($"Game Started");
     }
 

@@ -4,7 +4,6 @@ using UnityEngine;
 using H3MP.Networking;
 using System.Collections.Generic;
 
-
 namespace TeamsGameMode;
 
 [Serializable]
@@ -13,6 +12,7 @@ public class TGM_Rush : TGM_Gamemode
     List<Rush_CapturePoint> capturePoints = new List<Rush_CapturePoint>();
     int captureRatio = 2;  //1 in X will go to attack positions (Rest goes to Objective)
     int redSpawnRatio = 0;
+    bool isReversed = false;
 
     public TGM_Rush(string modeName = "", string modeDescription = "", Sprite modeThumbnail = null)
     {
@@ -26,7 +26,10 @@ public class TGM_Rush : TGM_Gamemode
         base.LoadDefaultProfile();
         //Do Gamemode Settings here
         TGM_Settings.SetSetting(TGMSettingEnum.TimeLimit, 720);
+
     }
+
+    private bool IsSetup = false;
 
     public override void Setup()
     {
@@ -39,10 +42,43 @@ public class TGM_Rush : TGM_Gamemode
         }
         TGM_MainMenu.instance.UpdateSettings();
 
+        if (!IsSetup)
+        {
+            IsSetup = true;
+            TGM_Settings.gamemodeSettings = new List<TGM_Settings.Setting>() 
+            {
+                new TGM_Settings.Setting
+                {
+                    description = "Reverse Mode:",
+                    settings = ["Disabled", "Enabled"],
+                    type = TGM_Settings.Setting.SettingType.Strings,
+                    value = 0,
+                    intMin = 0,
+                    intMax = 1,
+                    intIncrement = 1,
+                    localOnly = false,
+                }
+            };
+
+            TGM_MainMenu.instance.SetupGamemodeSettings();
+        }
+
         //Hide Objective UI
         for (int i = 0; i < TGM_TeamSetup.instance.teamObjectiveAdjust.Length; i++)
         {
             TGM_TeamSetup.instance.teamObjectiveAdjust[i].SetActive(false);
+        }
+
+        //H3MP
+        if (Tools.ServerRunning())
+        {
+            //Sync Rush data
+            if (connectionRush == null)
+            {
+                connectionRush = Tools.CreateCustomConnection("TGM_Rush");
+                connectionRush.ServerHandlerEvent += Rush_Receiver;
+                connectionRush.ClientHandlerEvent += Rush_Receiver;
+            }
         }
     }
 
@@ -144,7 +180,7 @@ public class TGM_Rush : TGM_Gamemode
 
         TGM_Compass.instance.gameTimeText.text = time.Minutes + ":" + (time.Seconds < 10 ? "0" + time.Seconds : time.Seconds);
 
-        if (Networking.IsClient())
+        if (Tools.IsClient())
             return;
 
         //Only Blue gets Respawn in Pregame
@@ -209,36 +245,29 @@ public class TGM_Rush : TGM_Gamemode
         base.OnJoinTeam(iff);
 
         int enemyIFF = TGM_Sosigs.GetEnemyIFF(GM.CurrentPlayerBody.GetPlayerIFF());
-
-        /*
-        Transform markerPoint =
-            (TGM_Manager.instance.team[enemyIFF].currentSpawnArea.capturePoint != null) ?
-            TGM_Manager.instance.team[enemyIFF].currentSpawnArea.capturePoint :
-            TGM_Manager.instance.team[enemyIFF].currentSpawnArea.objective;
-        */
-        
-        //Give player some direction to the combat area
-        /*
-        if (markerPoint != null)
-        {
-            TGM_Compass.instance.CreateMarker(
-                TGM_Compass.instance.markerSprites[(int)TGM_Compass.MarkerEnum.Attack],
-                iff == redIFF ? Color.red : Color.blue,
-                markerPoint);
-        }
-        */
     }
 
-    public override void AdjustTeamScore(int teamIFF, int amount)
+    public override void AdjustTeamScore(int teamIFF, int amount, bool network = true)
     {
         if (TGM_Manager.gameState != TGM_Manager.GameStateEnum.Gameplay || teamIFF == -1)
             return;
 
-        TGM_Manager.instance.team[teamIFF].currentScore += amount;
-
         //Increase player score
         if (teamIFF == GM.CurrentPlayerBody.GetPlayerIFF())
             TGM_Manager.instance.localPlayer.score += amount;
+
+        //Network
+        if (Tools.ServerRunning() && network)
+        {
+            if (Tools.IsHost())
+            {
+                TGM_Network.AdjustScores_ToClients(teamIFF, amount);
+            }
+            else
+                TGM_Network.AdjustScores_ToServer(teamIFF, amount);
+        }
+
+        TGM_Manager.instance.team[teamIFF].currentScore += amount;
 
         //Score hit the goal, they win!
         if (TGM_Manager.instance.team[teamIFF].currentScore >= TGM_Manager.instance.team[teamIFF].scoreGoal)
@@ -307,17 +336,7 @@ public class TGM_Rush : TGM_Gamemode
         if (iff == blueIFF)
         {
             //Defenders
-            TGM_Sosigs.OrderSosigToLocations(s, TGM_Manager.instance.team[iff].currentSpawnArea.GetRandomDefendArea());
-
-            /*
-            //If in pregame, get sosigs to GUARD their positions
-            if (TGM_Manager.gameState == TGM_Manager.GameStateEnum.Pregame)
-            {
-                s.CurrentOrder = Sosig.SosigOrder.GuardPoint;
-                s.FallbackOrder = Sosig.SosigOrder.GuardPoint;
-                s.SetCurrentOrder(Sosig.SosigOrder.GuardPoint);
-            }
-            */
+            TGM_Sosigs.OrderSosigToLocations(s, TGM_Manager.instance.team[iff].currentSpawnArea.GetRandomDefendArea(isReversed));
         }
         else
         {
@@ -326,7 +345,7 @@ public class TGM_Rush : TGM_Gamemode
             if (redSpawnRatio++ >= captureRatio)
             {
                 //Move to attack positions
-                TGM_Sosigs.OrderSosigToLocations(s, TGM_Manager.instance.team[enemyIFF].currentSpawnArea.GetRandomAttackArea());
+                TGM_Sosigs.OrderSosigToLocations(s, TGM_Manager.instance.team[enemyIFF].currentSpawnArea.GetRandomAttackArea(isReversed));
                 redSpawnRatio = 0;
             }
             else
@@ -362,7 +381,7 @@ public class TGM_Rush : TGM_Gamemode
                 if (iff == blueIFF)
                 {
                     //Blue Defenders
-                    TGM_Sosigs.OrderSosigToLocations(s, TGM_Manager.instance.team[iff].currentSpawnArea.GetRandomDefendArea());
+                    TGM_Sosigs.OrderSosigToLocations(s, TGM_Manager.instance.team[iff].currentSpawnArea.GetRandomDefendArea(isReversed));
                 }
                 else
                 {
@@ -371,7 +390,7 @@ public class TGM_Rush : TGM_Gamemode
                     if (redSpawnRatio++ >= captureRatio)
                     {
                         //Move to attack positions
-                        TGM_Sosigs.OrderSosigToLocations(s, TGM_Manager.instance.team[enemyIFF].currentSpawnArea.GetRandomAttackArea());
+                        TGM_Sosigs.OrderSosigToLocations(s, TGM_Manager.instance.team[enemyIFF].currentSpawnArea.GetRandomAttackArea(isReversed));
                         redSpawnRatio = 0;
                     }
                     else
@@ -386,6 +405,19 @@ public class TGM_Rush : TGM_Gamemode
 
     void SetupAreas()
     {
+        //Reverse Mode
+        if (!isReversed && TGM_Settings.GetModeSetting(0) == 1)
+        {
+            isReversed = true;
+            ReverseAreas();
+
+        }
+        else if (isReversed && TGM_Settings.GetModeSetting(0) == 0)
+        {
+            isReversed = false;
+            ReverseAreas();
+        }
+
         //Assign all areas to Team Blue
         for (int i = 0; i < TGM_Scene.instance.areas.Length; i++)
         {
@@ -400,5 +432,69 @@ public class TGM_Rush : TGM_Gamemode
         if (TGM_Scene.instance.areas[1] != TGM_Manager.instance.team[redIFF].currentSpawnArea)    //If Next spot is not owned by Red
             TGM_Manager.instance.team[blueIFF].currentSpawnArea = TGM_Scene.instance.areas[1]; //2nd Area belongs to Blue
         TGM_Manager.instance.team[blueIFF].currentSpawnArea.iff = blueIFF;
+    }
+
+    void ReverseAreas()
+    {
+        TGM_Area[] newArray = new TGM_Area[TGM_Scene.instance.areas.Length];
+        for (int i = TGM_Scene.instance.areas.Length - 1, j = 0; i >= 0; i--, j++)
+        {
+            newArray[j] = TGM_Scene.instance.areas[i];
+        }
+        TGM_Scene.instance.areas = newArray;
+        //RED
+        TGM_Scene.instance.teams[redIFF].startSpawnArea = TGM_Scene.instance.areas[0];
+        TGM_Manager.instance.team[redIFF].currentSpawnArea = TGM_Scene.instance.areas[0];
+        TGM_Scene.instance.areas[0].iff = redIFF;
+
+        //BLUE
+        int areaMax = TGM_Scene.instance.areas.Length - 1;
+        TGM_Scene.instance.teams[blueIFF].startSpawnArea = TGM_Scene.instance.areas[1];
+        TGM_Manager.instance.team[blueIFF].currentSpawnArea = TGM_Scene.instance.areas[areaMax];
+        TGM_Scene.instance.areas[areaMax].iff = blueIFF;
+    }
+
+
+    // H3MP
+
+    public static CustomConnection connectionRush;
+
+    //------------------------------------------------------------------------------
+    // Gameplay
+    //------------------------------------------------------------------------------
+
+    void Rush_Receiver(int clientID, PacketData packet)
+    {
+        //Host doesn't get settings
+        if (!Tools.ServerRunning())
+            return;
+
+        if (Tools.IsHost())
+        {
+            //Apply Host Update
+        }
+        else
+        {
+            //Apply Client Update
+        }
+    }
+
+    public void Rush_ToServer()
+    {
+        if (!Tools.ServerRunning())
+            return;
+
+        PacketData packet = new PacketData(connectionRush.ToServerID);
+
+        connectionRush.ClientToServer(packet);
+    }
+    public void Rush_ToClients()
+    {
+        if (!Tools.ServerRunning())
+            return;
+
+        PacketData packet = new PacketData(connectionRush.ToServerID);
+
+        connectionRush.ClientToServer(packet);
     }
 }

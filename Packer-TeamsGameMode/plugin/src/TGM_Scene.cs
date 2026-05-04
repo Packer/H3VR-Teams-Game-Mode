@@ -3,7 +3,6 @@ using H3MP.Networking;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using TeamsGameMode.H3MP;
 using UnityEngine;
 using UnityEngine.AI;
 
@@ -21,8 +20,6 @@ public class TGM_Scene : MonoBehaviour
     public Vector3 defaultResetPosition;
     [HideInInspector]
     public Quaternion defaultResetRotation;
-
-    public NavMeshSurface vehicleNavMesh;
 
     [Header("Menus")]
     public Transform mainMenu;
@@ -122,10 +119,6 @@ public class TGM_Scene : MonoBehaviour
 
         //Create our Gamemode assets
         TGM_Manager manager = Instantiate(TGM_ModLoader.tgmAssets.manager);
-
-        //Add Networking if H3MP is enabled
-        if (Networking.H3MPEnabled)
-            manager.gameObject.AddComponent<TGM_Networking>();
         yield return new WaitForEndOfFrame();
 
         Instantiate(TGM_ModLoader.tgmAssets.mainMenu, mainMenu.position, mainMenu.rotation * Quaternion.Euler(0, 180, 0));
@@ -278,6 +271,12 @@ public class TGM_Scene : MonoBehaviour
                     newAreas.Add(new TGM_Area());
                 }
                 areas = newAreas.ToArray();
+            }
+
+            for (int i = 0; i < areas.Length; i++)
+            {
+                if (areas[i] != null)
+                    areas[i].index = i;
             }
         }
     }

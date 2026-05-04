@@ -51,6 +51,16 @@ public class TGM_Settings
         gameSettings[(int)setting].value = value;
     }
 
+    public static int GetModeSetting(int setting)
+    {
+        return gamemodeSettings[setting].value;
+    }
+
+    public static void SetModeSetting(int setting, int value)
+    {
+        gamemodeSettings[setting].value = value;
+    }
+
     public static List<Setting> gamemodeSettings = new List<Setting>();
     public static List<Setting> gameSettings = new List<Setting>() 
     {

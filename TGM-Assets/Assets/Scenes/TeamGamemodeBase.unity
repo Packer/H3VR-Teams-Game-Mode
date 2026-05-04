@@ -626,12 +626,18 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   teams:
-  - respawnArea: {fileID: 0}
+  - name: Red
+    respawnArea: {fileID: 0}
     startSpawnArea: {fileID: 1325673442}
     teamSpawnTime: 5
-  - respawnArea: {fileID: 0}
+    defaultPlayerTeam: Meatcenaries
+    defaultSosigTeam: Meat Fortress Meatcenaries
+  - name: Blue
+    respawnArea: {fileID: 0}
     startSpawnArea: {fileID: 0}
     teamSpawnTime: 5
+    defaultPlayerTeam: Meatcenaries
+    defaultSosigTeam: Meat Fortress Meatcenaries
   areas:
   - {fileID: 1325673442}
   - {fileID: 0}
@@ -639,6 +645,7 @@ MonoBehaviour:
   playerResetPoint: {fileID: 0}
   defaultResetPosition: {x: 0, y: 0, z: 0}
   defaultResetRotation: {x: 0, y: 0, z: 0, w: 0}
+  vehicleNavMesh: {fileID: 0}
   mainMenu: {fileID: 530380924}
   teamSetupMenu: {fileID: 975639887}
   profilesMenu: {fileID: 804684773}
@@ -2721,6 +2728,7 @@ MonoBehaviour:
   m_Script: {fileID: 1182119491, guid: 2dad86f9e6b5aece0f7796226ce8c243, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  index: 0
   iff: 0
   capturePoint: {fileID: 706550843}
   objective: {fileID: 2095327091}
@@ -2729,6 +2737,7 @@ MonoBehaviour:
   - name: 
     playerSpawnPoints: []
     sosigSpawnPoints: []
+    sosigVehicleSpawnPoints: []
     sosigAttackAreas: []
     sosigDefendAreas: []
   friendlyObjects: []
